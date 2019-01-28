@@ -1,0 +1,8 @@
+= Eventuate Tram documentation
+Copyright (c) 2019 Chris Richardson Consulting Inc. All rights reserved
+
+The reference documentation consists of the following sections:
+
+[horizontal]
+<<whats-new.html#whats-new,What's new>> :: New features and other changes
+<<cdc-configuration.html#cdc-configuration,CDC configuration>> :: How to configure the CDC service
