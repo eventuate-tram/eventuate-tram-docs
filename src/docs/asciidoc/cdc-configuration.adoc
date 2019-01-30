@@ -39,6 +39,8 @@ Eventuate CDC supports the following databases:
 * MySQL
 * Postgres
 
+It can also support any RDBMS with a JDBC driver, although the CDC service would need to be rebuilt with the driver.
+
 === Supported message brokers
 
 Eventuate CDC supports the following message brokers
@@ -67,7 +69,7 @@ The Eventuate CDC service is conveniently packaged as a Docker image.
 |===
 
 
-TODO renames:
+TODO WIP renames:
 
 * eventuateio-local-new-cdc-service -> eventuateio-local-cdc-service
 * eventuate-tram-cdc-mysql-service -> eventuateio-tram-cdc-service
@@ -98,7 +100,7 @@ The MySQ binlog reader records its current position (file, offset) in the MySql 
 There are two types of offset store depending on which message broker is being used:
 
 * Apache Kafka topic - when using Apache Kafka
-* Database table -  when using Apache ActiveMQ or RabbitMQ
+* Database table -  when a message broker other than Apache Kafka
 
 The offset is stored using a key value of `reader.mySqlBinLogClientName` property, which enables multiple readers to use the same store.
 
@@ -631,6 +633,13 @@ The Eventuate CDC service also has the following configuration properties.
 
 TODO: This should probably be replaced with N x reader.replicationLagMeasuringIntervalInMilliseconds
 
+== Configuring infrastructure services
+
+The CDC service requires various infrastructure services including:
+
+* Relational database, such as MySQL or Postgres
+* Message broker, such as Apache Kafka
+
 === CDC Database schema
 
 The Eventuate CDC service requires several tables.
@@ -658,7 +667,7 @@ This topic should have the following configuration:
 
 The Eventuate CDC service has several features that enable monitoring in a production environment.
 
-==== Health Check endpoint
+=== Health Check endpoint
 
 The Eventuate CDC service has a standard https://microservices.io/patterns/observability/health-check-api.html[Spring Boot health check endpoint] `<eventuate-local-base-url>/actuator/health`.
 It reports on the health of the following:
@@ -672,7 +681,7 @@ It reports on the health of the following:
 *** It did not receive events recently as defined by the `eventuatelocal.cdc.max.event.interval.to.assume.reader.healthy` property, which defaults to 60 seconds. (PostgresWal, MySqlBinlog only)
 * Publisher - is unhealthy when the last attempt at publishing the message failed.
 
-==== Metrics
+=== Metrics
 
 The Eventuate CDC service publishes the https://microservices.io/patterns/observability/application-metrics.html[standard Spring Boot/Prometheus metrics] via the following endpoint `<eventuate-local-base-url>/actuator/prometheus`.
 
