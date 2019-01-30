@@ -1,0 +1,18 @@
+:toclevels: 5
+:toc:
+:numbered:
+
+[[whats-new]]
+= What's new
+
+The version of the Eventuate CDC service (WIP CDC, Eventuate Local 0.30.0.M12, Eventuate Tram 0.20.0.M8) has numerous new features:
+
+* Multi-reader/multi-pipeline support - rather than reading from either a single Eventuate Local `EVENTS` table or Eventuate Tram `MESSAGE` table, the new CDC can read from multiple `EVENTS` and/or `MESSAGE` tables.
+This enables, for example, the FTGO application to run a single CDC service instead of two separate CDC services.
+It also enables a single CDC service to support the scenario where each service has its own `EVENTS` or `MESSAGE` table.
+
+* Support for Apache ActiveMQ and RabbitMQ - Eventuate Tram applications can now use Apache ActiveMQ and RabbitMQ.
+
+* Improved observability
+** Health Check endpoint - the CDC service now implements a Spring Boot Actuator-based Health check endpoint
+** CDC service metrics - the CDC service uses Spring Boot Actuator to expose Prometheus metrics
