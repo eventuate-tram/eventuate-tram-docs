@@ -1,0 +1,358 @@
+:toclevels: 5
+:toc:
+:numbered:
+
+[[getting-started]]
+= Getting started with Eventuate Tram
+
+Learn how to get started with https://github.com/eventuate-tram/eventuate-tram-core[Eventuate Tram], a framework for transactional messaging.
+Eventuate Tram sends and receives messages as part of a database transaction ensuring that your application atomically updates the database and publishes messages.
+Currently, it supports
+
+* MySQL and Postgres databases
+* Apache Kafka message broker
+
+== See also
+
+* link:./about-eventuate-tram.html[Overview of EventuateTram]
+* https://eventuate.io/exampleapps.html[Tram example applications]
+* The https://github.com/eventuate-tram/eventuate-tram-core[Eventuate Tram Github repository]
+* The https://github.com/eventuate-tram/eventuate-tram-sagas[Eventuate Tram Sagas Github repository]
+* The https://www.manning.com/books/microservices-patterns[Microservices Patterns] book
+
+== Project setup
+
+Latest library version:
+
+https://api.bintray.com/packages/eventuateio-oss/eventuate-maven-release/eventuate-tram/images/download.svg[ ![Download] ](https://bintray.com/eventuateio-oss/eventuate-maven-release/eventuate-tram/_latestVersion)
+
+=== Gradle
+
+
+In `gradle.properties`:
+
+```
+eventuateTramVersion=LATEST_VERSION
+```
+
+In `build.gradle`, specify the JCenter maven repository:
+
+
+```groovy
+repositories {
+    mavenCentral()
+    jcenter()
+}
+```
+
+Include one or more of the following dependencies, depending on which API you want to use, along with a messaging transport:
+
+```groovy
+dependencies {
+
+  // Basic messaging
+
+  compile "io.eventuate.tram.core:eventuate-tram-events:$eventuateTramVersion"
+
+  // Domain events
+
+  compile "io.eventuate.tram.core:eventuate-tram-events:$eventuateTramVersion"
+
+  // Command/Async Reply messaging
+
+  compile "io.eventuate.tram.core:eventuate-tram-commands:$eventuateTramVersion"
+
+  // Use JDBC and Apache Kafka as the underlying messaging transport
+
+  compile "io.eventuate.tram.core:eventuate-tram-jdbc-kafka:$eventuateTramVersion"
+
+  // Use in-memory messaging transport for testing
+
+  testCompile "io.eventuate.tram.core:eventuate-tram-in-memory:$eventuateTramVersion"
+
+}
+```
+
+== Transactional messages
+
+Eventuate Tram has APIs for sending and receiving messages as part of a database transaction.
+
+=== Sending messages
+
+Send a message using `MessageProducer`:
+
+```java
+public abstract class AbstractTramMessageTest {
+
+  @Autowired
+  private MessageProducer messageProducer;
+
+  @Test
+  public void shouldReceiveMessage() {
+    ...
+    messageProducer.send(destination, MessageBuilder.withPayload(payload).build());
+    ...
+  }
+```
+
+See this example of https://github.com/eventuate-tram/eventuate-tram-core-examples-basic/blob/master/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/messages/AbstractTramMessageTest.java[sending messages].
+
+=== Consuming messages
+
+Receive messages using `MessageConsumer`:
+
+```java
+public abstract class AbstractTramMessageTest {
+
+  @Autowired
+  private MessageConsumer messageConsumer;
+
+  @Test
+  public void shouldReceiveMessage() throws InterruptedException {
+    messageConsumer.subscribe(subscriberId, Collections.singleton(destination), this::handleMessage);
+    ...
+  }
+
+  private void handleMessage(Message message) {
+    ...
+  }
+}
+```
+
+See this example of https://github.com/eventuate-tram/eventuate-tram-core-examples-basic/blob/master/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/messages/AbstractTramMessageTest.java[consuming messages].
+
+== Transactional domain events
+
+The domain event package builds on the transaction messaging APIs.
+
+=== Publishing domain events
+
+Publish domain events using the `DomainEventPublisher` interface:
+
+```java
+public abstract class AbstractTramEventTest {
+
+  @Autowired
+  private DomainEventPublisher domainEventPublisher;
+
+  @Test
+  public void shouldReceiveEvent() throws InterruptedException {
+    long uniqueId = config.getUniqueId();
+    String accountId = ...;
+
+    DomainEvent domainEvent = new AccountDebited(...);
+
+    domainEventPublisher.publish("Account", accountId, Collections.singletonList(domainEvent));
+```
+
+To publish events you need to `@Import` the `TramEventsPublisherConfiguration.class` `@Configuration` class:
+
+```java
+@Configuration
+@Import(TramEventsPublisherConfiguration.class)
+public class AbstractTramEventTestConfiguration {
+...
+```
+See this example of https://github.com/eventuate-tram/eventuate-tram-core-examples-basic/blob/master/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/events/AbstractTramEventTest.java[transaction events].
+
+=== Consuming domain events
+
+First, define `DomainEventHandlers`:
+
+```java
+public class TramEventTestEventConsumer {
+
+  public DomainEventHandlers domainEventHandlers() {
+    return DomainEventHandlersBuilder
+            .forAggregateType("Account")
+            .onEvent(AccountDebited.class, this::handleAccountDebited)
+            .build();
+  }
+
+  public void handleAccountDebited(DomainEventEnvelope<AccountDebited> event) {
+    ...
+  }
+
+}
+```
+
+Second, configure a `DomainEventDispatcher` `@Bean`:
+
+```java
+@Configuration
+public class AbstractTramEventTestConfiguration {
+
+  @Bean
+  public DomainEventDispatcher domainEventDispatcher(AbstractTramEventTestConfig config,
+                                                     TramEventTestEventConsumer target,
+                                                     MessageConsumer messageConsumer) {
+    return new DomainEventDispatcher("eventDispatcherId",
+            target.domainEventHandlers(),
+            messageConsumer);
+  }
+
+  @Bean
+  public TramEventTestEventConsumer tramEventTestTarget(AbstractTramEventTestConfig config) {
+    return new TramEventTestEventConsumer();
+  }
+```
+
+You need the following Spring `@Configuration` in order to publish events:
+
+```java
+@Configuration
+@Import(TramEventsPublisherConfiguration.class)
+public class AbstractTramEventTestConfiguration {
+
+}
+```
+
+See this example of https://github.com/eventuate-tram/eventuate-tram-core-examples-basic/blob/master/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/events/AbstractTramEventTest.java[transaction events].
+
+== Transactional commands
+
+Transactional commands are implemented using transactional messaging.
+
+=== Sending commands
+
+Send a command using a `CommandProducer`:
+
+```java
+public abstract class AbstractTramCommandTest {
+
+  @Autowired
+  private CommandProducer commandProducer;
+
+  @Test
+  public void shouldInvokeCommand() throws InterruptedException {
+
+    String commandId = commandProducer.send("CustomerCommandChannel",
+            new DoSomethingCommand(),
+            "ReplyToChannel",
+            Collections.emptyMap());
+
+```
+
+You also need to `@Import` the `TramCommandProducerConfiguration` `@Configuration` class:
+
+```java
+@Configuration
+@Import(TramCommandProducerConfiguration.class)
+public class AbstractTramCommandTestConfiguration {
+
+```
+
+See this example of https://github.com/eventuate-tram/eventuate-tram-core-examples-basic/blob/master/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/commands/AbstractTramCommandTest.java[transactional commands].
+
+=== Handling commands
+
+First, define `CommandHandlers`:
+
+```java
+public class TramCommandTestCommandHandler {
+
+  public Message doSomething(CommandMessage<DoSomethingCommand> cm, PathVariables pvs) {
+    ...
+    return withSuccess();
+  }
+
+  public CommandHandlers getCommandHandlers() {
+    return CommandHandlersBuilder
+            .fromChannel("CustomerCommandChannel")
+            .onMessage(DoSomethingCommand.class, this::doSomething)
+            .build();
+
+  }
+```
+
+Second, define a `CommandDispatcher` `@Bean`:
+
+```java
+@Configuration
+public class AbstractTramCommandTestConfiguration {
+
+  @Bean
+  public CommandDispatcher commandDispatcher(AbstractTramCommandTestConfig config, AbstractTramCommandTestCommandHandler target) {
+  return new CommandDispatcher("customerServiceCommandDispatcher", target.getCommandHandlers());
+}
+
+@Bean
+public TramCommandTestCommandHandler abstractTramCommandTestTarget(AbstractTramCommandTestConfig config) {
+  return new TramCommandTestCommandHandler(config.getCommandChannel());
+}
+```
+
+See this example of https://github.com/eventuate-tram/eventuate-tram-core-examples-basic/blob/master/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/commands/AbstractTramCommandTest.java[transactional commands].
+
+
+== Configuring the transport
+
+=== JDBC/Apache Kafka transport
+
+If you want to use JDBC/Apache Kafka `@Import` `TramJdbcKafkaConfiguration`:
+
+```java
+@Configuration
+@EnableAutoConfiguration
+@Import({TramJdbcKafkaConfiguration.class})
+public class JdbcKafkaTramMessageTestConfiguration {
+}
+```
+
+=== In-memory transport
+
+If you want to use JDBC/Apache Kafka `@Import` `TramInMemoryConfiguration`:
+
+```java
+@Configuration
+@EnableAutoConfiguration
+@Import({TramInMemoryConfiguration.class})
+public class TramInMemoryConfiguration {
+}
+```
+
+== Configuration properties
+
+There are various configuration properties that need to be set for JDBC/Kafka transport.
+Here, for example, is an https://github.com/eventuate-tram/eventuate-tram-core-examples-basic/blob/master/eventuate-tram-examples-jdbc-kafka/src/test/resources/application.properties[`application.properties`] file:
+
+```
+spring.datasource.url=jdbc:mysql://${DOCKER_HOST_IP}/eventuate
+spring.datasource.username=mysqluser
+spring.datasource.password=mysqlpw
+spring.datasource.driver.class.name=com.mysql.jdbc.driver
+eventuatelocal.kafka.bootstrap.servers=${DOCKER_HOST_IP}:9092
+eventuatelocal.zookeeper.connection.string=${DOCKER_HOST_IP}:2181
+```
+
+See https://github.com/eventuate-tram/eventuate-tram-core-examples-basic/blob/master/eventuate-tram-examples-jdbc-kafka/src/test/resources/application.properties[application.properties]
+
+== Running the CDC service
+
+In addition to a database and message broker, you will need to run the Eventuate Tram CDC service.
+It reads events inserted into the database and publishes them to Apache Kafka.
+It is written using Spring Boot.
+The easiest way to run this service during development is to use Docker Compose.
+The https://github.com/eventuate-tram/eventuate-tram-core-examples-basic[Eventuate Tram Code Basic examples] project has an example https://github.com/eventuate-tram/eventuate-tram-core-examples-basic/blob/master/docker-compose.yml[docker-compose.yml file].
+
+```yaml
+cdcservice:
+  image: eventuateio/eventuate-tram-cdc-mysql-service:0.4.0.RELEASE
+  ports:
+    - "8099:8080"
+  depends_on:
+    - mysql
+    - kafka
+    - zookeeper
+  environment:
+    SPRING_DATASOURCE_URL: jdbc:mysql://mysql/eventuate
+    SPRING_DATASOURCE_USERNAME: mysqluser
+    SPRING_DATASOURCE_PASSWORD: mysqlpw
+    SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.jdbc.Driver
+    EVENTUATELOCAL_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    EVENTUATELOCAL_ZOOKEEPER_CONNECTION_STRING: zookeeper:2181
+    EVENTUATELOCAL_CDC_DB_USER_NAME: root
+    EVENTUATELOCAL_CDC_DB_PASSWORD: rootpassword
+    EVENTUATELOCAL_CDC_BINLOG_CLIENT_ID: 1234567890
+    EVENTUATELOCAL_CDC_SOURCE_TABLE_NAME: message
+```
