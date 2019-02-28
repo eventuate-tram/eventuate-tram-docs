@@ -531,7 +531,7 @@ The currently configured consumer properties are as follows:
 | org.apache.kafka.common.serialization.StringDeserializer
 |===
 
-You can override these properties and supply other Apache Kafka Consumer properties by defining properties prefixed with `eventuate.local.kafka.consumer`.
+You can override these properties and supply other Apache Kafka Consumer properties by defining properties prefixed with `eventuate.local.kafka.consumer.properties`.
 
 
 ===== Apache Kafka Producer Properties
@@ -568,7 +568,7 @@ The currently configured producer properties are as follows.
 
 |===
 
-You can override these properties and supply other Apache Kafka Producer properties by defining properties prefixed with `eventuate.local.kafka.producer`.
+You can override these properties and supply other Apache Kafka Producer properties by defining properties prefixed with `eventuate.local.kafka.producer.properties`.
 
 
 ==== Apache ActiveMQ
