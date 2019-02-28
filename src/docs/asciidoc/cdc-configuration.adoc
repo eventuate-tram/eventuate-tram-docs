@@ -183,12 +183,12 @@ There are two sets of properties, one for the reader and another for the pipelin
 | `/eventuatelocal/cdc/leader/1`
 | leadershipLockPath
 
-| eventuatelocal.cdc.my.sql.bin.log.client.name
+| eventuatelocal.cdc.mysql.binlog.client.name
 | (mysql-binlog only)
 
 The client key used to store the current offset in the offset store.
 | -
-| mySqlBinLogClientName
+| mySqlBinlogClientName
 
 | eventuatelocal.cdc.offset.storage.topic.name
 | (mysql-binlog)
@@ -232,12 +232,12 @@ Unique identifier across whole replication group.
 | -
 | binlogClientId
 
-| eventuatelocal.cdc.old.debezium.db.offset.storage.topic.name
+| eventuatelocal.cdc.read.old.debezium.db.offset.storage.topic
 | (mysql-binlog only)
 
-Apache Kafka topic used by the old Debezium-based CDC to store offsets of read events.
+Boolean flag, set it to "true" to start read records from the old debezium kafka topic, set it to "false" to start read records from the new cdc kafka topic.
 | -
-| oldDebeziumDbOffsetStorageTopicName
+| ReadOldDebeziumDbOffsetStorageTopic
 
 | eventuatelocal.cdc.polling.interval.in.milliseconds
 | (polling only)
@@ -342,7 +342,7 @@ A reader has the properties shown in the following table.
 | Zookeeper node path used for the leadership election. The Zookeeper leadership recipe is used to select a leader. Example value: `/eventuatelocal/cdc/leader/1`
 | -
 
-| mySqlBinLogClientName
+| mySqlBinlogClientName
 | (mysql-binlog only)
 
 The client key used to store the current offset in the offset store.
@@ -384,10 +384,10 @@ Password of the MYSQL reader user.
 Unique identifier across whole replication group.
 | -
 
-| oldDebeziumDbOffsetStorageTopicName
+| readOldDebeziumDbOffsetStorageTopic
 | (mysql-binlog only).
 
-Apache Kafka topic used by the old Debezium-based Eventuate CDC to store current reader offset.
+Boolean flag, set it to "true" to start read records from the old debezium kafka topic, set it to "false" to start read records from the new cdc kafka topic.
 | -
 
 | postgresWalIntervalInMilliseconds
@@ -531,7 +531,7 @@ The currently configured consumer properties are as follows:
 | org.apache.kafka.common.serialization.StringDeserializer
 |===
 
-You can override these properties and supply other Apache Kafka Consumer properties by defining properties prefixed with `eventuate.local.kafka.consumer`.
+You can override these properties and supply other Apache Kafka Consumer properties by defining properties prefixed with `eventuate.local.kafka.consumer.properties`.
 
 
 ===== Apache Kafka Producer Properties
@@ -568,7 +568,7 @@ The currently configured producer properties are as follows.
 
 |===
 
-You can override these properties and supply other Apache Kafka Producer properties by defining properties prefixed with `eventuate.local.kafka.producer`.
+You can override these properties and supply other Apache Kafka Producer properties by defining properties prefixed with `eventuate.local.kafka.producer.properties`.
 
 
 ==== Apache ActiveMQ
@@ -797,19 +797,19 @@ In order to upgrade from the Debezium-based Eventuate Local CDC for MySQL (`even
 | Name
 | Value
 
-| EVENTUATELOCAL_CDC_OLD_DEBEZIUM_DB_OFFSET_STORAGE_TOPIC_NAME
-| eventuate.local.cdc.my-sql-connector.offset.storage
+| EVENTUATELOCAL_CDC_READ_OLD_DEBEZIUM_DB_OFFSET_STORAGE_TOPIC
+| true
 
 | EVENTUATELOCAL_CDC_BINLOG_CLIENT_ID
 | 85744 (the value used by the Debezium-based Eventuate Local CDC)
 
-| EVENTUATELOCAL_CDC_MY_SQL_BIN_LOG_CLIENT_NAME
+| EVENTUATELOCAL_CDC_MYSQL_BINLOG_CLIENT_NAME
 | MySqlBinlog
 
 |===
 
 
-The `EVENTUATELOCAL_CDC_OLD_DEBEZIUM_DB_OFFSET_STORAGE_TOPIC_NAME` property configures the UCDC to Debezium-maintained offset from the old offset store Apache Kafka topic.
+The `EVENTUATELOCAL_CDC_READ_OLD_DEBEZIUM_DB_OFFSET_STORAGE_TOPIC` property configures the UCDC to Debezium-maintained offset from the old offset store Apache Kafka topic.
 
 ==== Upgrading from 'new' Eventuate Local CDC
 
@@ -831,7 +831,7 @@ Some properties have changed names and default values.
 
 | eventuatelocal.cdc.my.sql.bin.log.client.name
 | MySqlBinLog
-| eventuatelocal.cdc.my.sql.bin.log.client.name
+| eventuatelocal.cdc.mysql.binlog.client.name
 | -
 
 | eventuatelocal.cdc.db.history.topic.name
@@ -839,9 +839,9 @@ Some properties have changed names and default values.
 | eventuatelocal.cdc.offset_storage.topic.name
 | offset.storage.topic
 
-| eventuatelocal.cdc.old.debezium.db.history.topic.name
-| eventuate.local.cdc.my-sql-connector.offset.storage
 | eventuatelocal.cdc.old.debezium.db.offset.storage.topic.name
+| eventuate.local.cdc.my-sql-connector.offset.storage
+| eventuatelocal.cdc.read.old.debezium.db.history.topic
 | -
 
 |===
@@ -855,8 +855,8 @@ For example, define these additional properties:
 | Name
 | Value
 
-| EVENTUATELOCAL_CDC_OLD_DEBEZIUM_DB_OFFSET_STORAGE_TOPIC_NAME
-| none
+| EVENTUATELOCAL_CDC_READ_OLD_DEBEZIUM_DB_OFFSET_STORAGE_TOPIC
+| false
 
 | EVENTUATELOCAL_CDC_OFFSET_STORAGE_TOPIC_NAME
 | db.history.topic  (or whatever was specified previously)
@@ -876,10 +876,10 @@ To upgrade from the Eventuate Tram CDC ()`eventuateio/eventuate-tram-cdc-mysql-s
 | Name
 | Value
 
-| EVENTUATELOCAL_CDC_OLD_DEBEZIUM_DB_OFFSET_STORAGE_TOPIC_NAME
-| none
+| EVENTUATELOCAL_CDC_READ_OLD_DEBEZIUM_DB_OFFSET_STORAGE_TOPIC
+| false
 
-| EVENTUATELOCAL_CDC_MY_SQL_BIN_LOG_CLIENT_NAME
+| EVENTUATELOCAL_CDC_MYSQL_BINLOG_CLIENT_NAME
 | MySqlBinLog (or whatever was specified previously)
 
 |===
@@ -957,7 +957,7 @@ tram-cdc-service:
     EVENTUATE_CDC_READER_READER1_BINLOGCLIENTID: 1
     EVENTUATE_CDC_READER_READER1_CDCDBUSERNAME: root
     EVENTUATE_CDC_READER_READER1_CDCDBPASSWORD: rootpassword
-    EVENTUATE_CDC_READER_READER1_OLDDEBEZIUMDBOFFSETSTORAGETOPICNAME: none
+    EVENTUATE_CDC_READER_READER1_READOLDDEBEZIUMDBOFFSETSTORAGETOPIC: "false"
     EVENTUATE_CDC_READER_READER1_MYSQLBINLOGCLIENTNAME: ClientEventuateLocal
     EVENTUATE_CDC_READER_READER1_OFFSETSTORAGETOPICNAME: db.history.eventuate.local
 
@@ -971,7 +971,7 @@ tram-cdc-service:
     EVENTUATE_CDC_READER_READER2_BINLOGCLIENTID: 2
     EVENTUATE_CDC_READER_READER2_CDCDBUSERNAME: root
     EVENTUATE_CDC_READER_READER2_CDCDBPASSWORD: rootpassword
-    EVENTUATE_CDC_READER_READER2_OLDDEBEZIUMDBOFFSETSTORAGETOPICNAME: none
+    EVENTUATE_CDC_READER_READER2_READOLDDEBEZIUMDBOFFSETSTORAGETOPIC: "false"
     EVENTUATE_CDC_READER_READER2_MYSQLBINLOGCLIENTNAME: ClientEventuateTram
     EVENTUATE_CDC_READER_READER2_OFFSETSTORAGETOPICNAME: db.history.eventuate.tram
 ```
