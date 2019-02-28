@@ -5,10 +5,8 @@ The reference documentation consists of the following sections:
 
 [horizontal]
 <<whats-new.html#whats-new,What's new>> :: New features and other changes
+<<distributed-data-management.html#distributed-data-management, Distributed data management in a microservice architecture>> :: Why Eventuate Tram?
 <<about-eventuate-tram.html#about-eventuate-tram,Overview of Eventuate Tram>> :: Overview of Eventuate Tram
 <<getting-started-eventuate-tram.html#getting-started,Getting started with Eventuate Tram>> :: Getting started with Eventuate Tram
-<<cdc-configuration.html#cdc-configuration,CDC configuration>> :: How to configure the CDC service
-
-////
-<<getting-started.html#getting-started,Getting started>> :: Getting started with Eventuate Saga orchestration TODO
-////
+<<getting-started-eventuate-tram-sagas.html#getting-started-tram-sagas,Getting started with Eventuate Tram Sagas>> :: Getting started with Eventuate Tram Saga ochestration
+<<cdc-configuration.html#cdc-configuration,CDC configuration>> :: Configuring the CDC service

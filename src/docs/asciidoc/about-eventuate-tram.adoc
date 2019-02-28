@@ -1,49 +1,49 @@
-= About Eventuate Tram
+[[about-eventuate-tram]]
+== About Eventuate Tram
 
-The Eventuate Tram framework enables a Java/Spring application to send messages as part of an database transaction.
-This enables an application atomically update state and send a message or a domain event.
-It is a foundation of maintaining data consistency within a microservice architecture.
-
-Eventuate Tram is a framework developing asynchronous microservices that use the the traditional JDBC/JPA-based persistence model.
-Unlike /whyeventsourcing.html[event sourcing], adding Eventuate Tram to your Spring/Sprint Boot application requires minimal changes.
+Eventuate Tram is a framework for link:./distributed-data-management.html[managing distributed data] in a microservice architecture.
+It enables a Java application to send and receive messages as part of an database transaction.
+It does this by implementing the https://microservices.io/patterns/data/application-events.html[Transactional outbox pattern].
+This pattern is foundation of maintaining data consistency within a microservice architecture.
+It is used to implement the https://microservices.io/patterns/data/saga.html[Saga pattern], which implements transactions multiple services, and the https://microservices.io/patterns/data/cqrs.html[CQRS pattern], which implements queries that retrieve data from multiple services.
 
 Eventuate Tram provides several messaging abstractions:
 
 * messaging - send and receive messages over named channels
-* events - publish domain events and subscribe to domain events
-* commands - asynchronously send a command to a service and receive a reply
+* events - publish and consume domain events
+* commands - asynchronously invoke a service by sending a command message and receiving a reply message
 
-== The architecture of an Eventuate Tram application
+=== The architecture of an Eventuate Tram application
 
 The following diagram shows the architecture of the https://github.com/eventuate-tram/eventuate-tram-examples-java-spring-todo-list[Eventuate Tram Todo application]:
 
-<img src="https://github.com/eventuate-tram/eventuate-tram-examples-java-spring-todo-list/raw/master/images/Architecture.png" class="img-responsive">
+image::https://github.com/eventuate-tram/eventuate-tram-examples-java-spring-todo-list/raw/master/images/Architecture.png[]
 
-The application consists of two services:
+The application consists of two application services:
 
 * `Todo Service` - implements the REST endpoints for creating, updating and deleting todos.
 The service persists the Todo JPA entity in MySQL.
-Using `Eventuate Tram`, it publishes Todo domain events that are consumed by the `Todo View Service`.
+Using `Eventuate Tram`, it publishes `Todo` domain events.
 
-* `Todo View Service` - implements a REST endpoint for querying the todos.
-It maintains a CQRS view of the todos in ElasticSearch.
+* `Todo View Service` - implements a REST endpoint for querying the `Todos`.
+It maintains a CQRS view of the `Todos` in ElasticSearch.
+The `Todo View Service` subscribes to the events using Eventuate Tram and updates ElasticSearch.
 
-The `Todo Service` publishes events using Eventuate Tram.
-Eventuate Tram inserts events into the `MESSAGE` table as part of the ACID transaction that updates the TODO table.
-The Eventuate Tram CDC service tracks inserts into the `MESSAGE` table using the MySQL binlog and publishes messages to Apache Kafka.
-The `Todo View Service` subscribes to the events and updates ElasticSearch.
+The `Todo Service` publishes events using Eventuate Tram, which  inserts events into the `MESSAGE` table as part of the ACID transaction that updates the `TODO` table.
+The Eventuate Tram CDC service reads messages inserted into the `MESSAGE` table using either https://microservices.io/patterns/data/transaction-log-tailing.html[Transaction log tailing] or https://microservices.io/patterns/data/polling-publisher.html[Polling] and publishes them to a message broker, such as Apache Kafka.
 
-== About Eventuate Tram Sagas
+=== About Eventuate Tram Sagas
 
-https://github.com/eventuate-tram/eventuate-tram-sagas[Eventuate Tram sagas] builds on Eventuate Tram to provide orchestration-based sagas.
+https://github.com/eventuate-tram/eventuate-tram-sagas[Eventuate Tram sagas] builds on Eventuate Tram to provide https://microservices.io/patterns/data/saga.html[orchestration-based sagas].
 Instead of simply relying on services to respond to domain events, you define a saga orchestrator, which tells the saga participants what operations to execute.
-To understand the difference between choreography using domain events and orchestration, please see this http://microservices.io/microservices/news/2017/12/04/qconsf2017-presentation.html[presentation].
+To understand the difference between choreography using domain events and orchestration, please read this https://microservices.io/patterns/data/saga.html[article] and see this https://www.slideshare.net/chris.e.richardson/yow2018-events-and-commands-developing-asynchronous-microservices[presentation].
 
-== Learn more
+=== Learn more
 
 To learn more, please see:
 
-* link:./tram/getting-started-eventuate-tram.html[Getting started with Eventuate Tram]
+* link:./getting-started-eventuate-tram.html[Getting started with Eventuate Tram]
+* link:./getting-started-eventuate-tram-sagas.html[Getting started with Eventuate Tram Sagas]
 * The https://github.com/eventuate-tram/eventuate-tram-core[Eventuate Tram Github repository]
 * The https://github.com/eventuate-tram/eventuate-tram-sagas[Eventuate Tram Sagas Github repository]
 * The https://eventuate.io/exampleapps.html[example applications]

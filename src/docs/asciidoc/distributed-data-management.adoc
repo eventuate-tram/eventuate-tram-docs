@@ -1,0 +1,61 @@
+[[distributed-data-management]]
+== Managing distributed data in a microservice architecture
+
+image:http://eventuate.io/i/distributeddataproblems.png[]
+
+A key characteristic of the microservice architecture is that https://microservices.io/patterns/data/database-per-service.html[each service has its own database].
+This is important to ensure loose coupling but it makes transaction management and querying challenging.
+
+### Maintaining data consistency is a challenge
+
+You must implement business transactions that span services but two-phase commit (2PC) is rarely an option.
+
+### Querying is a challenge
+
+You must implement queries that retrieve data from multiple services.
+
+## Using an asynchronous, microservice architecture.
+
+The solution to these distributed data management problems is to use the https://microservices.io/patterns/data/saga.html[Saga pattern] and the https://microservices.io/patterns/data/cqrs.html[CQRS pattern].
+In such an architecture, services communicate asynchronously using domain events, and command/reply messages.
+
+
+#### Using sagas to maintain data consistency
+
+image::http://eventuate.io/i/eventdrivencreditcheck.png[]
+
+Sagas are a transaction model for the microservice architecture.
+A saga is a sequence of local transactions.
+Each local transaction updates the data in one service and sends a message/event that triggers the next transaction.
+For more information, please read the https://microservices.io/patterns/data/saga.html[Saga pattern].
+
+#### Using CQRS views
+
+image::http://eventuate.io/i/maintainingviews.png[]
+
+CQRS views are a way to implement queries that span services in a microservice architecture.
+A CQRS view is a replica of data from one or more services that is optimized for a particular set of queries.
+The service that maintains the view does so by subscribing to domain events.
+Whenever a service, updates its data it publishes a domain event.
+For more information, please read the https://microservices.io/patterns/data/cqrs.html[CQRS pattern].
+
+### The problem of atomically updating the database and publishing messages
+
+image::http://eventuate.io/i/atomicity.png[]
+
+You can use an asynchronous architecture to solve the distributed data management challenges in a microservices architecture.
+However, one major challenge with implementing an asynchronous architecture is atomically updating the database and sending a message.
+
+Consider, for example, the `Create Order` use case.
+The  service that implements this use case must perform two operations: insert a row into the ORDER table and publish an `OrderCreated` event.
+It is essential that both operations are done atomically.
+If only one operation happened because of a failure then the system would behave incorrectly.
+
+The standard way to atomically update state and publish a message is to use a distributed transaction involving a database and a message broker.
+However, for the reasons described earlier this is exactly what we do not want to do.
+Instead, an application must use the https://microservices.io/patterns/data/application-events.html[Transactional outbox pattern].
+The link:./about-eventuate-tram.html[Eventuate Tram framework] provides an implementation of this pattern.
+
+=== Learn more
+
+To learn more, please see this overview of link:./about-eventuate-tram.html[Eventuate Tram framework]

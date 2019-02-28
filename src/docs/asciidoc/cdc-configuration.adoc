@@ -1,11 +1,7 @@
-:toclevels: 5
-:toc:
-:numbered:
-
 [[cdc-configuration]]
-= ﻿Configuring the Eventuate CDC Service
+= Configuring the Eventuate CDC Service
 
-This section describes how to configure the Eventuate CDC service (WIP CDC, Eventuate Local 0.30.0.M12, Eventuate Tram 0.20.0.M8).
+This section describes how to configure the Eventuate CDC service (Eventuate Local 0.30.X, Eventuate Tram 0.20.X).
 
 == Introduction to the CDC service
 

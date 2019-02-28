@@ -1,7 +1,3 @@
-:toclevels: 5
-:toc:
-:numbered:
-
 [[whats-new]]
 = What's new
 
