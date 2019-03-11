@@ -185,7 +185,7 @@ There are two sets of properties, one for the reader and another for the pipelin
 | offsetStoreKey
 
 | eventuatelocal.cdc.reader.name
-| Identificates reader. Used for the mysql binlog profile as key to store the current offset in the offset store if eventuatelocal.cdc.offset.store.key is not specified.
+| The name of the reader. If eventuatelocal.cdc.offset.store.key is not specified, it is used by the mysql binlog reader as the key to store the current offset in the offset store 
 | -
 | -
 
