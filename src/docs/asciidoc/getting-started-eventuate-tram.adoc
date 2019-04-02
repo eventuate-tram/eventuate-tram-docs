@@ -26,7 +26,7 @@ And, the following message brokers:
 
 Latest library version:
 
-image::https://api.bintray.com/packages/eventuateio-oss/eventuate-maven-release/eventuate-tram/images/download.svg[link="https://bintray.com/eventuateio-oss/eventuate-maven-release/eventuate-tram/_latestVersion"]
+image::https://api.bintray.com/packages/eventuateio-oss/eventuate-maven-rc/eventuate-tram/images/download.svg[link="https://bintray.com/eventuateio-oss/eventuate-maven-rc/eventuate-tram/_latestVersion"]
 
 ==== Gradle
 
@@ -37,15 +37,20 @@ In `gradle.properties`:
 eventuateTramVersion=LATEST_VERSION
 ```
 
-In `build.gradle`, specify the JCenter maven repository:
+In `build.gradle`, specify these maven repositories:
 
 
 ```groovy
 repositories {
     mavenCentral()
     jcenter()
+    maven {
+        url "https://dl.bintray.com/eventuateio-oss/eventuate-maven-rc"
+    }
 }
 ```
+
+Note: the additional repository
 
 Include one or more of the following dependencies, depending on which API you want to use, along with a messaging transport:
 
