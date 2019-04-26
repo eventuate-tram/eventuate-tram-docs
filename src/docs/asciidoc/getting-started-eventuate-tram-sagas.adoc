@@ -42,7 +42,7 @@ There are four parts to using Eventuate Tram Saga to implement an orchestration-
 The artifacts are in https://bintray.com/eventuateio-oss/eventuate-maven-rc/eventuate-tram-sagas[Eventuate Maven Release Candidate Repository].
 The latest version is:
 
-image::https://api.bintray.com/packages/eventuateio-oss/eventuate-maven-rc/eventuate-tram-sagas/images/download.svg[link="https://bintray.com/eventuateio-oss/eventuate-maven-rc/eventuate-tram-sagas/_latestVersion"]
+image::https://api.bintray.com/packages/eventuateio-oss/eventuate-maven-release/eventuate-tram-sagas/images/download.svg[link="https://bintray.com/eventuateio-oss/eventuate-maven-release/eventuate-tram-sagas/_latestVersion"]
 
 In `gradle.properties`:
 
@@ -56,13 +56,8 @@ In `build.gradle`, specify these maven repositories:
 repositories {
     mavenCentral()
     jcenter()
-    maven {
-        url "https://dl.bintray.com/eventuateio-oss/eventuate-maven-rc"
-    }
 }
 ```
-
-Note: the additional repository
 
 
 If you are writing a Saga orchestrator add this dependency to your project:
