@@ -581,8 +581,18 @@ To publish messages to Apache ActiveMQ, please enable the `ActiveMQ` Spring prof
 
 | activemq.url
 | Url of the activemq server.
-| Format: <protocol>://<ip>:<port>
+
+Format: <protocol>://<ip>:<port>
+
 Example: tcp://172.17.0.1:61616
+| -
+
+| activemq.user
+| user used for authorization in the activemq
+| -
+
+| activemq.password
+| password used for authorization in the activemq
 | -
 
 |===
