@@ -57,19 +57,10 @@ The Eventuate CDC service is conveniently packaged as a Docker image.
 | Image
 | Description
 
-| eventuateio/eventuateio-local-new-cdc-service:0.30.0.M12
-| Eventuate Local
-
-| eventuateio/eventuate-tram-cdc-mysql-service:0.20.0.M8
+| eventuateio/eventuate-cdc-service:<TODO>
 | Eventuate Tram + Eventuate Local
 
 |===
-
-
-TODO WIP renames:
-
-* eventuateio-local-new-cdc-service -> eventuateio-local-cdc-service
-* eventuate-tram-cdc-mysql-service -> eventuateio-tram-cdc-service
 
 == How it works
 
@@ -151,9 +142,9 @@ Reader:
 
 Pipeline:
 
-* The pipeline type is determined by the service
-   * Eventuate Local CDC service - Eventuate Local pipeline
-   * Eventuate Tram CDC service - Eventuate Tram pipeline
+* The pipeline type is determined by `eventuate.cdc.type` property
+   * `eventuate.cdc.type=EventuateLocal` - Eventuate Local pipeline
+   * `eventuate.cdc.type=EventuateTram` - Eventuate Tram pipeline (used by default when property is not specified)
 
 Publishing:
 
