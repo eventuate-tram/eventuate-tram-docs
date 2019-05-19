@@ -7,7 +7,7 @@ The version of the Eventuate CDC service (WIP CDC, Eventuate Local 0.30.0.M12, E
 This enables, for example, the FTGO application to run a single CDC service instead of two separate CDC services.
 It also enables a single CDC service to support the scenario where each service has its own `EVENTS` or `MESSAGE` table.
 
-* Support for Apache ActiveMQ and RabbitMQ - Eventuate Tram applications can now use Apache ActiveMQ and RabbitMQ.
+* Support for Apache ActiveMQ, RabbitMQ, Redis - Eventuate Tram applications can now use Apache ActiveMQ and RabbitMQ.
 
 * Improved observability
 ** Health Check endpoint - the CDC service now implements a Spring Boot Actuator-based Health check endpoint

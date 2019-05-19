@@ -13,6 +13,7 @@ And, the following message brokers:
 * Apache Kafka
 * ActiveMQ
 * RabbitMQ
+* Redis
 
 === See also
 

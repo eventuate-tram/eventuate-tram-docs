@@ -44,6 +44,7 @@ Eventuate CDC supports the following message brokers
 * Apache Kafka - Eventuate Local and Eventuate Tram
 * Apache ActiveMQ - Eventuate Tram only
 * RabbitMQ - Eventuate Tram only
+* Redis - Eventuate Tram only
 
 
 === Docker images
@@ -103,6 +104,7 @@ The offset is stored using a key value of `reader.offsetStoreKey` property (or n
 ==== CDC Leadership election
 
 When running a cluster of Eventuate CDC services, a reader uses a Zookeeper-based leadership election to determine which reader is active.
+When cdc is configured to use Redis message broker (`spring.profiles.active=Redis`), Redis is used instead of Zookeeper for leadership.
 
 === About Pipelines
 
@@ -124,6 +126,7 @@ There are three types of publishers:
 * Apache Kafka
 * Apache ActiveMQ
 * RabbitMQ
+* Redis
 
 == Configuring the Eventuate CDC service
 
@@ -155,7 +158,7 @@ Pipeline:
 Publishing:
 
 * Eventuate Local CDC service - Apache Kafka only
-* Eventuate Tram CDC service - The default is Apache Kafka but you can use Apache ActiveMQ or RabbitMQ by activating the appropriate profile (described below).
+* Eventuate Tram CDC service - The default is Apache Kafka but you can use Apache ActiveMQ, RabbitMQ, Redis by activating the appropriate profile (described below).
 
 There are two sets of properties, one for the reader and another for the pipeline.
 
@@ -176,6 +179,7 @@ There are two sets of properties, one for the reader and another for the pipelin
 
 | eventuatelocal.cdc.leadership.lock.path
 | Zookeeper node path used for the leadership election. Only one reader with the same properties is allowed at the moment. To achieve that the zookeeper leadership recipe is used.
+When Redis is used as message broker, it also used for leadership election. In that case the same property used as Redis key.
 | `/eventuatelocal/cdc/leader/1`
 | leadershipLockPath
 
@@ -339,6 +343,7 @@ A reader has the properties shown in the following table.
 
 | leadershipLockPath
 | Zookeeper node path used for the leadership election. The Zookeeper leadership recipe is used to select a leader. Example value: `/eventuatelocal/cdc/leader/1`
+When Redis is used as message broker, it also used for leadership election. In that case the same property used as Redis key.
 | -
 
 | offsetStorageTopicName
@@ -476,7 +481,7 @@ The Eventuate Tram CDC supports `eventuate-tram` and `eventuate-local`
 The publisher is invoked by the pipeline to publish a message/event to the message broker.
 The Eventuate Local CDC service only supports Apache Kafka, since it relies on Kafka’s message retention capability.
 By default, the Eventuate Tram CDC service publishes messages to Apache Kafka.
-But it also supports Apache ActiveMQ and RabbitMQ.
+But it also supports Apache ActiveMQ, RabbitMQ, Redis.
 
 ==== Apache Kafka
 
@@ -576,8 +581,18 @@ To publish messages to Apache ActiveMQ, please enable the `ActiveMQ` Spring prof
 
 | activemq.url
 | Url of the activemq server.
-| Format: <protocol>://<ip>:<port>
+
+Format: <protocol>://<ip>:<port>
+
 Example: tcp://172.17.0.1:61616
+| -
+
+| activemq.user
+| user used for authorization in the activemq
+| -
+
+| activemq.password
+| password used for authorization in the activemq
 | -
 
 |===
@@ -601,6 +616,30 @@ Example: 172.17.0.1
 
 | rabbitmq.port
 | Port of the RabbitMQ server
+| -
+
+|===
+
+==== Redis
+
+To publish messages to Redis, please enable the `Redis` Spring profile using `spring.profiles.active=Redis`.
+
+
+[cols=3, options="header"]
+|===
+
+| Name
+| Description
+| Default Value
+
+| eventuate.redis.servers
+| Redis hosts and ports separated by commas
+Example: 172.17.0.1:6379,172.17.0.1:6380
+| -
+
+| eventuate.redis.partitions
+| Number of partitions. Messages are split between partitions similar to kafka.
+Partition is selected depending on message key hash. Processing of messages with the same partitions are ordered.
 | -
 
 |===
@@ -646,7 +685,7 @@ Each reader that uses transaction log tailing (MySQL binlog/Postgres WAL) period
 
 ==== `OFFSET_STORE` table
 
-When publishing messages to Apache ActiveMQ or RabbitMQ, the MySql binlog reader records the current binlog position in this table.
+When publishing messages to Apache ActiveMQ, RabbitMQ, Redis, the MySql binlog reader records the current binlog position in this table.
 
 === Apache Kafka broker configuration
 
