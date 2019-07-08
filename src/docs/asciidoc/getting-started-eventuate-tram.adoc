@@ -27,7 +27,7 @@ And, the following message brokers:
 
 Latest library version:
 
-image::https://api.bintray.com/packages/eventuateio-oss/eventuate-maven-release/eventuate-tram/images/download.svg[link="https://bintray.com/eventuateio-oss/eventuate-maven-release/eventuate-tram/_latestVersion"]
+image::https://api.bintray.com/packages/eventuateio-oss/eventuate-maven-rc/eventuate-tram/images/download.svg[link="https://bintray.com/eventuateio-oss/eventuate-maven-rc/eventuate-tram/_latestVersion"]
 
 ==== Gradle
 
@@ -48,14 +48,14 @@ repositories {
 }
 ```
 
-Include one or more of the following dependencies, depending on which API you want to use, along with a messaging transport:
+Include one or more of the following dependencies, depending on which API you want to use:
 
 ```groovy
 dependencies {
 
   // Basic messaging
 
-  compile "io.eventuate.tram.core:eventuate-tram-events:$eventuateTramVersion"
+  compile "io.eventuate.tram.core:eventuate-tram-messaging:$eventuateTramVersion"
 
   // Domain events
 
@@ -64,10 +64,28 @@ dependencies {
   // Command/Async Reply messaging
 
   compile "io.eventuate.tram.core:eventuate-tram-commands:$eventuateTramVersion"
+```
+
+You also need to pick a transport mechanism:
+
+```groovy
+dependencies {
 
   // Use JDBC and Apache Kafka as the underlying messaging transport
 
   compile "io.eventuate.tram.core:eventuate-tram-jdbc-kafka:$eventuateTramVersion"
+
+  // Use JDBC and Apache ActiveMQ as the underlying messaging transport
+
+  compile "io.eventuate.tram.core:eventuate-tram-jdbc-activemq:$eventuateTramVersion"
+
+  // Use JDBC and RabbitMQ as the underlying messaging transport
+
+  compile "io.eventuate.tram.core:eventuate-tram-jdbc-rabbitmq:$eventuateTramVersion"
+
+  // Use JDBC and Redis Streams as the underlying messaging transport
+
+  compile "io.eventuate.tram.core:eventuate-tram-jdbc-redis:$eventuateTramVersion"
 
   // Use in-memory messaging transport for testing
 
@@ -161,6 +179,7 @@ public class AbstractTramEventTestConfiguration {
 ...
 ----
 
+
 See this example of https://github.com/eventuate-tram/eventuate-tram-core-examples-basic/blob/master/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/events/AbstractTramEventTest.java[transaction events].
 
 ==== Consuming domain events
@@ -193,29 +212,17 @@ Second, configure a `DomainEventDispatcher` `@Bean`:
 public class AbstractTramEventTestConfiguration {
 
   @Bean
-  public DomainEventDispatcher domainEventDispatcher(AbstractTramEventTestConfig config,
-                                                     TramEventTestEventConsumer target,
-                                                     MessageConsumer messageConsumer) {
-    return new DomainEventDispatcher("eventDispatcherId",
-            target.domainEventHandlers(),
-            messageConsumer);
+  public DomainEventDispatcher domainEventDispatcher(DomainEventDispatcherFactory domainEventDispatcherFactory,,
+                                                     AbstractTramEventTestConfig config,
+                                                     TramEventTestEventConsumer target) {
+    return domainEventDispatcherFactory.make("eventDispatcherId",
+            target.domainEventHandlers());
   }
 
   @Bean
   public TramEventTestEventConsumer tramEventTestTarget(AbstractTramEventTestConfig config) {
     return new TramEventTestEventConsumer();
   }
-----
-
-You need the following Spring `@Configuration` in order to publish events:
-
-[source,java]
-----
-@Configuration
-@Import(TramEventsPublisherConfiguration.class)
-public class AbstractTramEventTestConfiguration {
-
-}
 ----
 
 See this example of https://github.com/eventuate-tram/eventuate-tram-core-examples-basic/blob/master/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/events/AbstractTramEventTest.java[transaction events].
@@ -255,6 +262,13 @@ public class AbstractTramCommandTestConfiguration {
 
 ----
 
+To handle a reply message, simply subscribe to the `ReplyChannel`.
+
+[source,java]
+----
+messageConsumer.subscribe(subscriberId, "ReplyToChannel", this::handleMessage);
+----
+
 See this example of https://github.com/eventuate-tram/eventuate-tram-core-examples-basic/blob/master/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/commands/AbstractTramCommandTest.java[transactional commands].
 
 ==== Handling commands
@@ -287,8 +301,10 @@ Second, define a `CommandDispatcher` `@Bean`:
 public class AbstractTramCommandTestConfiguration {
 
   @Bean
-  public CommandDispatcher commandDispatcher(AbstractTramCommandTestConfig config, AbstractTramCommandTestCommandHandler target) {
-  return new CommandDispatcher("customerServiceCommandDispatcher", target.getCommandHandlers());
+  public CommandDispatcher commandDispatcher(CommandDispatcherFactory commandDispatcherFactory,
+                                             AbstractTramCommandTestConfig config,
+                                             AbstractTramCommandTestCommandHandler target) {
+  return commandDispatcherFactory.make("customerServiceCommandDispatcher", target.getCommandHandlers());
 }
 
 @Bean
@@ -302,9 +318,16 @@ See this example of https://github.com/eventuate-tram/eventuate-tram-core-exampl
 
 === Configuring the transport
 
-==== JDBC/Apache Kafka transport
+You also need to configure the transport mechanism, specifically the message broker.
+You do this importing one of the `TramJdbc<MessageBroker>Configuration` classes:
 
-If you want to use JDBC/Apache Kafka `@Import` `TramJdbcKafkaConfiguration`:
+* `TramJdbcKafkaConfiguration`
+* `TramJdbcActiveMQConfiguration`
+* `TramJdbcRabbitMQConfiguration`
+* `TramJdbcRedisConfiguration`
+* `TramInMemoryConfiguration` - in-memory JDBC and messaging
+
+For example, if you want to use JDBC/Apache Kafka then `@Import` `TramJdbcKafkaConfiguration`:
 
 [source,java]
 ----
@@ -314,6 +337,60 @@ If you want to use JDBC/Apache Kafka `@Import` `TramJdbcKafkaConfiguration`:
 public class JdbcKafkaTramMessageTestConfiguration {
 }
 ----
+
+
+=== Configuration properties
+
+There are various configuration properties that need to be set for each transport.
+
+Since JDBC is used, you must set the usual properties, such as:
+
+----
+spring.datasource.url=jdbc:mysql://${DOCKER_HOST_IP}/eventuate
+spring.datasource.username=mysqluser
+spring.datasource.password=mysqlpw
+spring.datasource.driver.class.name=com.mysql.jdbc.driver
+----
+
+
+In addition, you need to define message broker-specific properties.
+
+[cols="25%, 75%", options="header"]
+|===
+| Message Broker
+| Properties
+
+| Apache Kafka
+a|
+----
+eventuatelocal.kafka.bootstrap.servers=${DOCKER_HOST_IP}:9092
+eventuatelocal.zookeeper.connection.string=${DOCKER_HOST_IP}:2181
+----
+
+| Apache ActiveMQ
+a|
+----
+activemq.url=...
+----
+
+| RabbitMQ
+a|
+----
+rabbitmq.url=...
+eventuate.rabbitmq.partition.count=...
+----
+
+| Redis
+a|
+----
+eventuate.redis.servers=...
+eventuate.redis.partitions=...
+----
+
+|===
+
+
+See https://github.com/eventuate-tram/eventuate-tram-core-examples-basic/blob/master/eventuate-tram-examples-jdbc-kafka/src/test/resources/application.properties[application.properties]
 
 ==== In-memory transport
 
@@ -328,28 +405,14 @@ public class TramInMemoryConfiguration {
 }
 ----
 
-=== Configuration properties
-
-There are various configuration properties that need to be set for JDBC/Kafka transport.
-Here, for example, is an https://github.com/eventuate-tram/eventuate-tram-core-examples-basic/blob/master/eventuate-tram-examples-jdbc-kafka/src/test/resources/application.properties[`application.properties`] file:
-
-----
-spring.datasource.url=jdbc:mysql://${DOCKER_HOST_IP}/eventuate
-spring.datasource.username=mysqluser
-spring.datasource.password=mysqlpw
-spring.datasource.driver.class.name=com.mysql.jdbc.driver
-eventuatelocal.kafka.bootstrap.servers=${DOCKER_HOST_IP}:9092
-eventuatelocal.zookeeper.connection.string=${DOCKER_HOST_IP}:2181
-----
-
-See https://github.com/eventuate-tram/eventuate-tram-core-examples-basic/blob/master/eventuate-tram-examples-jdbc-kafka/src/test/resources/application.properties[application.properties]
 
 === Running the CDC service
 
-In addition to a database and message broker, you will need to run the Eventuate Tram CDC service.
-It reads events inserted into the database and publishes them to Apache Kafka.
+In addition to a database and message broker, you will need to run the link:./cdc-configuration.html[Eventuate Tram CDC] service.
+It reads events inserted into the database and publishes them to the message broker.
 It is written using Spring Boot.
 The easiest way to run this service during development is to use Docker Compose.
+
 The https://github.com/eventuate-tram/eventuate-tram-core-examples-basic[Eventuate Tram Code Basic examples] project has an example https://github.com/eventuate-tram/eventuate-tram-core-examples-basic/blob/master/docker-compose.yml[docker-compose.yml file].
 
 [source,yaml]
@@ -371,8 +434,10 @@ cdcservice:
     EVENTUATELOCAL_ZOOKEEPER_CONNECTION_STRING: zookeeper:2181
     EVENTUATELOCAL_CDC_DB_USER_NAME: root
     EVENTUATELOCAL_CDC_DB_PASSWORD: rootpassword
-    EVENTUATELOCAL_CDC_MYSQL_BINLOG_CLIENT_UNIQUE_ID: 1234567890
-    EVENTUATELOCAL_CDC_READER_NAME: Reader1
+    EVENTUATELOCAL_CDC_READER_NAME: MySqlReader
     EVENTUATELOCAL_CDC_OFFSET_STORE_KEY: MySqlBinlog
-    EVENTUATELOCAL_CDC_SOURCE_TABLE_NAME: message
+    EVENTUATELOCAL_CDC_MYSQL_BINLOG_CLIENT_UNIQUE_ID: 1234567890
+    EVENTUATELOCAL_CDC_READ_OLD_DEBEZIUM_DB_OFFSET_STORAGE_TOPIC: "false"
 ----
+
+For more information, please see link:./cdc-configuration.html[Eventuate Tram CDC]

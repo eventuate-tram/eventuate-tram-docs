@@ -23,10 +23,6 @@ The key parts are as follows:
 * Zookeeper - used by the reader for leadership election when clustered
 
 The Eventuate CDC service is a Spring Boot application.
-There are two flavors of the Eventuate CDC service:
-
-* Eventuate Local CDC service - Eventuate Local only
-* Eventuate Tram CDC service - Eventuate Local and Eventuate Tram
 
 === Supported databases
 
@@ -34,8 +30,9 @@ Eventuate CDC supports the following databases:
 
 * MySQL
 * Postgres
+* Microsoft SQL server
 
-It can also support any RDBMS with a JDBC driver, although the CDC service would need to be rebuilt with the driver.
+It can also support other databases that have a JDBC driver, although the CDC service would need to be rebuilt with the driver.
 
 === Supported message brokers
 
@@ -50,6 +47,9 @@ Eventuate CDC supports the following message brokers
 === Docker images
 
 The Eventuate CDC service is conveniently packaged as a Docker image.
+The latest version is
+
+image::https://api.bintray.com/packages/eventuateio-oss/eventuate-maven-release/eventuate-cdc/images/download.svg[link="https://bintray.com/eventuateio-oss/eventuate-maven-release/eventuate-cdc/_latestVersion"]
 
 [cols=2, options="header"]
 |===
@@ -57,7 +57,7 @@ The Eventuate CDC service is conveniently packaged as a Docker image.
 | Image
 | Description
 
-| eventuateio/eventuate-cdc-service:0.3.0.RELEASE
+| eventuateio/eventuate-cdc-service:LATEST_VERSION
 | Eventuate Tram + Eventuate Local
 
 |===
@@ -80,7 +80,7 @@ A CDC reader reads messages/events using one of the following mechanisms:
 
 * MySQL - transaction log tailing using the MySql binlog protocol
 * Postgres - transaction log tailing using Postgres WAL
-* Generic JDBC - polling the `OUTBOX` table by periodically executing a SQL `SELECT` statement to retrieve messages and an `UPDATE` to mark them as having been read.
+* Generic JDBC - polling the `OUTBOX` table by periodically executing a SQL `SELECT` statement to retrieve messages and an `UPDATE` statement to mark them as having been read.
 
 ==== MySQL binlog current offset storage
 
@@ -180,7 +180,7 @@ When Redis is used as message broker, it also used for leadership election. In t
 | offsetStoreKey
 
 | eventuatelocal.cdc.reader.name
-| The name of the reader. If eventuatelocal.cdc.offset.store.key is not specified, it is used by the mysql binlog reader as the key to store the current offset in the offset store 
+| The name of the reader. If eventuatelocal.cdc.offset.store.key is not specified, it is used by the mysql binlog reader as the key to store the current offset in the offset store
 | -
 | -
 
@@ -609,6 +609,11 @@ Example: 172.17.0.1
 | Port of the RabbitMQ server
 | -
 
+| eventuate.rabbitmq.partition.count
+| Number of partitions. Messages are split between partitions similar to Apache Kafka.
+Partition is selected depending on message key hash. Processing of messages with the same partitions are ordered.
+| -
+
 |===
 
 ==== Redis
@@ -629,7 +634,7 @@ Example: 172.17.0.1:6379,172.17.0.1:6380
 | -
 
 | eventuate.redis.partitions
-| Number of partitions. Messages are split between partitions similar to kafka.
+| Number of partitions. Messages are split between partitions similar to Apache Kafka.
 Partition is selected depending on message key hash. Processing of messages with the same partitions are ordered.
 | -
 
@@ -763,18 +768,18 @@ The Eventuate CDC service publishes the https://microservices.io/patterns/observ
 
 |===
 
-==  Upgrading to the UCDC
+==  Upgrading to the Eventuate CDC from older versions of the CDC (pre-Eventuate Local 0.30.X, pre-Eventuate Tram 0.20.X)
 
-The configuration properties of the UCDC are different than older versions of the CDC.
+The configuration properties of the Eventuate CDC are different than older versions of the CDC.
 When upgrading, you need to specify configuration properties that correctly correspond to those of the older CDC.
-In particular, if you are using MySQL you need to ensure that the UCDC is correctly configured to read the binlog offset maintained by the older CDC.
+In particular, if you are using MySQL you need to ensure that the Eventuate CDC is correctly configured to read the binlog offset maintained by the older CDC.
 
 The upgrade process consists of the following steps:
 
 . Stop old CDC
 . Apply schema migration to add new tables
-. Configure the new UCDC
-. Start the new UCDC
+. Configure the new Eventuate CDC
+. Start the new Eventuate CDC
 
 === Migrating the schema
 
@@ -790,7 +795,7 @@ ALTER TABLE received_messages ADD creation_time BIGINT;
 
 This script creates two new tables and adds the `creation_time` column to the messaging tables.
 
-=== Configuring the new CDC
+=== Configuring the Eventuate CDC
 
 There are few different upgrade scenarios depending on your starting point:
 
@@ -799,11 +804,11 @@ There are few different upgrade scenarios depending on your starting point:
 * Eventuate Tram CDC - `eventuateio/eventuate-tram-cdc-mysql-service:0.11.1.RELEASE` or older
 * Multiple older Eventuate Local/Eventuate Tram CDCs
 
-.Verifying the UCDC configuration using the dry run configuration parameter
+.Verifying the Eventuate CDC configuration using the dry run configuration parameter
 ****
-To verify that you have correctly configured the UCDC, you can specify this property `eventuate.cdc.service.dry.run=true`, e.g. set the environment variable `EVENTUATE_CDC_SERVICE_DRY_RUN=true`.
-When this property is set to true, the UCDC will display the starting offset of each reader and then exit.
-Once you have verified that the UCDC will resume at the right place, you can either remove this property or change its value to `true`.
+To verify that you have correctly configured the Eventuate CDC, you can specify this property `eventuate.cdc.service.dry.run=true`, e.g. set the environment variable `EVENTUATE_CDC_SERVICE_DRY_RUN=true`.
+When this property is set to true, the Eventuate CDC will display the starting offset of each reader and then exit.
+Once you have verified that the Eventuate CDC will resume at the right place, you can either remove this property or change its value to `true`.
 
 TODO add example
 
@@ -832,7 +837,7 @@ In order to upgrade from the Debezium-based Eventuate Local CDC for MySQL (`even
 |===
 
 
-The `EVENTUATELOCAL_CDC_READ_OLD_DEBEZIUM_DB_OFFSET_STORAGE_TOPIC` property configures the UCDC to Debezium-maintained offset from the old offset store Apache Kafka topic.
+The `EVENTUATELOCAL_CDC_READ_OLD_DEBEZIUM_DB_OFFSET_STORAGE_TOPIC` property configures the Eventuate CDC to Debezium-maintained offset from the old offset store Apache Kafka topic.
 
 ==== Upgrading from 'new' Eventuate Local CDC
 
@@ -845,7 +850,7 @@ Some properties have changed names and default values.
 [cols=4, options="header"]
 |===
 2+| New Eventuate Local CDC
-2+| UCDC
+2+| Eventuate CDC
 
 | Name
 | Default value
@@ -958,7 +963,7 @@ eventuate-local-cdc-service:
 
 | ```
 tram-cdc-service:
-  image: eventuateio/eventuate-tram-cdc-mysql-service::0.20.0.M8
+  image: eventuateio/eventuate-cdc-service:LATEST_VERSION
   ….
   environment:
     EVENTUATELOCAL_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
@@ -999,12 +1004,11 @@ tram-cdc-service:
 
 |===
 
-==== Upgrading to separate cdc
+==== Upgrading to `eventuateio/eventuate-cdc-service`
 
-To upgrade eventuate local or eventuate tram to eventuate cdc service
-replace image to eventuateio/eventuate-cdc-service:0.3.0.RELEASE.
+To upgrade from older Eventuate Local or Eventuate Tram specific images to `eventuateio/eventuate-cdc-service:LATEST_VERSION`:
 
-To use eventuate cdc as eventuate local cdc add variable EVENTUATE_CDC_TYPE: EventuateLocal.
-By default it uses tram cdc.
+* Eventuate Tram - By default, the Eventuate CDC supports Eventuate Tram.
+* Eventuate Local - add variable `EVENTUATE_CDC_TYPE: EventuateLocal`.
 
 Other properties were not changed.
