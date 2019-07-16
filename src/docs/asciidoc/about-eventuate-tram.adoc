@@ -1,8 +1,8 @@
 [[about-eventuate-tram]]
 == About Eventuate Tram
 
-Eventuate Tram is a framework for link:./distributed-data-management.html[managing distributed data] in a microservice architecture.
-It enables a Java application to send and receive messages as part of an database transaction.
+Eventuate Tram is a platform for link:./distributed-data-management.html[managing distributed data] in a microservice architecture.
+It enables a services to send and receive messages as part of an database transaction.
 It does this by implementing the https://microservices.io/patterns/data/application-events.html[Transactional outbox pattern].
 This pattern is foundation of maintaining data consistency within a microservice architecture.
 It is used to implement the https://microservices.io/patterns/data/saga.html[Saga pattern], which implements transactions multiple services, and the https://microservices.io/patterns/data/cqrs.html[CQRS pattern], which implements queries that retrieve data from multiple services.
@@ -15,21 +15,24 @@ Eventuate Tram provides several messaging abstractions:
 
 === The architecture of an Eventuate Tram application
 
-The following diagram shows the architecture of the https://github.com/eventuate-tram/eventuate-tram-examples-java-spring-todo-list[Eventuate Tram Todo application]:
+The following diagram shows the architecture of the hhttps://github.com/eventuate-tram/eventuate-tram-examples-customers-and-orders[Eventuate Tram Customers and Orders application]:
 
-image::https://github.com/eventuate-tram/eventuate-tram-examples-java-spring-todo-list/raw/master/images/Architecture.png[]
+image::https://github.com/eventuate-tram/eventuate-tram-examples-customers-and-orders/raw/master/images/Eventuate_Tram_Customer_and_Order_Architecture.png[]
 
-The application consists of two application services:
+The application consists of three services:
 
-* `Todo Service` - implements the REST endpoints for creating, updating and deleting todos.
-The service persists the Todo JPA entity in MySQL.
-Using `Eventuate Tram`, it publishes `Todo` domain events.
+* `Customer Service` - implements a REST API for managing customers.
+The service persists the `Customer` JPA entity in a MySQL/Postgres database.
+Using `Eventuate Tram`, it publishes `Customer` domain events that are consumed by the `Order Service` and the `Order History Service`.
 
-* `Todo View Service` - implements a REST endpoint for querying the `Todos`.
-It maintains a CQRS view of the `Todos` in ElasticSearch.
-The `Todo View Service` subscribes to the events using Eventuate Tram and updates ElasticSearch.
+* `Order Service` - implements REST API for managing orders.
+The service persists the `Order` JPA entity in MySQL/Postgres database.
+Using `Eventuate Tram`, it publishes `Order` domain events that are consumed by the `Customer Service` and the `Order History Service`.
+The `Order Service` creates orders using a choreography-based saga that consists of events being exchanged between the `Order Service` and `Customer Service`.
 
-The `Todo Service` publishes events using Eventuate Tram, which  inserts events into the `MESSAGE` table as part of the ACID transaction that updates the `TODO` table.
+* `Order History Service` - implements REST API for querying a customer's order history.
+This service subscribes to events published by the `Order Service` and `Customer Service` and updates a MongoDB-based CQRS view containing the order history.
+
 The Eventuate Tram CDC service reads messages inserted into the `MESSAGE` table using either https://microservices.io/patterns/data/transaction-log-tailing.html[Transaction log tailing] or https://microservices.io/patterns/data/polling-publisher.html[Polling] and publishes them to a message broker, such as Apache Kafka.
 
 === About Eventuate Tram Sagas
