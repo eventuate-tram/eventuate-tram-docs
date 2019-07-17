@@ -338,6 +338,19 @@ public class JdbcKafkaTramMessageTestConfiguration {
 }
 ----
 
+The `TramJdbc<MessageBroker>Configuration` `@Configuration` classes configure both a producer and a consumer.
+If you have a service that is either only a producer or only a consumer you can use a more specific  `@Configuration` class.
+
+To configure a producer, `@Import` the `TramMessageProducerJdbcConfiguration` @Configuration class.
+
+To consumer a consumer, `@Import` one of the `EventuateTram<MessageBroker>MessageConsumerConfiguration` @Configuration classes:
+
+* `EventuateTramKafkaMessageConsumerConfiguration`
+* `EventuateTramActiveMQMessageConsumerConfiguration`
+* `EventuateTramRabbitMQMessageConsumerConfiguration`
+* `EventuateTramRedisMessageConsumerConfiguration`
+
+For example, see the FTGO application's https://github.com/microservices-patterns/ftgo-application/blob/master/ftgo-order-history-service/src/main/java/net/chrisrichardson/ftgo/cqrs/orderhistory/main/OrderHistoryServiceMain.java[`Order History Service`], which is a consumer-only service.
 
 === Configuration properties
 

@@ -1,0 +1,11 @@
+
+= Eventuate Tram Documentation
+
+This is the manual for the https://github.com/eventuate-tram/eventuate-tram-core[Eventuate Tram] and https://github.com/eventuate-tram/eventuate-tram-sagas[Eventuate Tram Saga] projects.
+
+
+Eventuate Tram is a platform for managing distributed data in a microservice architecture.
+It implements the https://microservices.io/patterns/data/saga.html[Saga pattern], which implements transactions multiple services, and the https://microservices.io/patterns/data/cqrs.html[CQRS pattern], which implements queries that retrieve data from multiple services.
+Eventuate Tram enables a services to send and receive messages as part of an database transaction.
+It does this by implementing the https://microservices.io/patterns/data/application-events.html[Transactional outbox pattern].
+This pattern is foundation of maintaining data consistency within a microservice architecture.
