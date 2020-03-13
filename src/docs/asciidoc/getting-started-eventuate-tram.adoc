@@ -114,7 +114,7 @@ dependencies {
   compile "io.eventuate.tram.core:eventuate-tram-micronaut-commands:$eventuateTramVersion"
 ```
 
-For now only kafka is supported as transport mechanism:
+For now, the Micronaut version of Eventuate only supports Apache Kafka as the transport mechanism:
 
 ```groovy
 dependencies {
@@ -559,7 +559,7 @@ For example, see the FTGO application's https://github.com/microservices-pattern
 
 ===== Micronaut
 
-For now only kafka is support for micronaut.
+For now, the Micronaut version of Eventuate only supports Apache Kafka as the transport mechanism.
 
 You don't need to create additional configuration, you only need to setup dependencies (see <<dependency-configuration-section, dependency configuration section>>):
 
