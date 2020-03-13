@@ -25,7 +25,7 @@ And, the following message brokers:
 
 === JavaDocs
 
-* See the [Eventuate Tram JavaDocs](/docs/javadoc/eventuate-tram/eventuate-tram.html)
+* See the https://eventuate.io/docs/javadoc/eventuate-tram/eventuate-tram.html[Eventuate Tram JavaDocs].
 
 === Project setup
 
