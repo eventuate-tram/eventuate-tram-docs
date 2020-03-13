@@ -485,7 +485,17 @@ But it also supports Apache ActiveMQ, RabbitMQ, Redis.
 | eventuatelocal.kafka.bootstrap.servers
 | comma-separated list of host and port pairs
 | -
+
+| eventuate.cdc.kafka.enable.batch.processing
+| enables sending multiple eventuate local/tram events/messages inside singe kafka record.
+| false
+
+
+| eventuate.cdc.kafka.batch.processing.max.batch.size
+| max size of multi-message kafka record in bytes
+| 1000000
 |===
+
 
 ===== Apache Kafka Consumer Properties
 
