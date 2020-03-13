@@ -50,20 +50,22 @@ repositories {
 
 Include one or more of the following dependencies, depending on which API you want to use:
 
+===== Spring
+
 ```groovy
 dependencies {
 
   // Basic messaging
 
-  compile "io.eventuate.tram.core:eventuate-tram-messaging:$eventuateTramVersion"
+  compile "io.eventuate.tram.core:eventuate-tram-spring-messaging:$eventuateTramVersion"
 
   // Domain events
 
-  compile "io.eventuate.tram.core:eventuate-tram-events:$eventuateTramVersion"
+  compile "io.eventuate.tram.core:eventuate-tram-spring-events:$eventuateTramVersion"
 
   // Command/Async Reply messaging
 
-  compile "io.eventuate.tram.core:eventuate-tram-commands:$eventuateTramVersion"
+  compile "io.eventuate.tram.core:eventuate-tram-spring-commands:$eventuateTramVersion"
 ```
 
 You also need to pick a transport mechanism:
@@ -73,7 +75,7 @@ dependencies {
 
   // Use JDBC and Apache Kafka as the underlying messaging transport
 
-  compile "io.eventuate.tram.core:eventuate-tram-jdbc-kafka:$eventuateTramVersion"
+  compile "io.eventuate.tram.core:eventuate-tram-spring-jdbc-kafka:$eventuateTramVersion"
 
   // Use JDBC and Apache ActiveMQ as the underlying messaging transport
 
@@ -94,6 +96,42 @@ dependencies {
 }
 ```
 
+===== Micronaut
+[[dependency-configuration-section]]
+```groovy
+dependencies {
+
+  // Basic messaging
+
+  compile "io.eventuate.tram.core:eventuate-tram-micronaut-messaging:$eventuateTramVersion"
+
+  // Domain events
+
+  compile "io.eventuate.tram.core:eventuate-tram-micronaut-events:$eventuateTramVersion"
+
+  // Command/Async Reply messaging
+
+  compile "io.eventuate.tram.core:eventuate-tram-micronaut-commands:$eventuateTramVersion"
+```
+
+For now only kafka is supported as transport mechanism:
+
+```groovy
+dependencies {
+    // Use JDBC and Apache Kafka as the underlying messaging transport
+
+    // Sending messages via database
+    compile "io.eventuate.tram.core:eventuate-tram-micronaut-producer-jdbc:$eventuateTramVersion"
+
+    // Kafka message consumer
+    compile "io.eventuate.tram.core:eventuate-tram-micronaut-consumer-kafka:$eventuateTramVersion"
+
+    // Transactional message consuming / duplicate messaging detenction
+    compile "io.eventuate.tram.core:eventuate-tram-micronaut-consumer-jdbc:$eventuateTramVersion"
+
+}
+```
+
 === Transactional messages
 
 Eventuate Tram has APIs for sending and receiving messages as part of a database transaction.
@@ -101,6 +139,8 @@ Eventuate Tram has APIs for sending and receiving messages as part of a database
 ==== Sending messages
 
 Send a message using `MessageProducer`:
+
+===== Spring
 
 [source,java]
 ----
@@ -119,9 +159,30 @@ public abstract class AbstractTramMessageTest {
 
 See this example of https://github.com/eventuate-tram/eventuate-tram-core-examples-basic/blob/master/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/messages/AbstractTramMessageTest.java[sending messages].
 
+===== Micronaut
+
+[source,java]
+----
+public abstract class AbstractTramMessageTest {
+
+  @Inject
+  private MessageProducer messageProducer;
+
+  @Test
+  public void shouldReceiveMessage() {
+    ...
+    messageProducer.send(destination, MessageBuilder.withPayload(payload).build());
+    ...
+  }
+----
+
+See this example of https://github.com/eventuate-tram/eventuate-tram-core-micronaut-examples-basic/blob/master/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/messages/AbstractTramMessageTest.java[sending messages].
+
 ==== Consuming messages
 
 Receive messages using `MessageConsumer`:
+
+===== Spring
 
 [source,java]
 ----
@@ -144,6 +205,29 @@ public abstract class AbstractTramMessageTest {
 
 See this example of https://github.com/eventuate-tram/eventuate-tram-core-examples-basic/blob/master/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/messages/AbstractTramMessageTest.java[consuming messages].
 
+===== Micronaut
+
+[source,java]
+----
+public abstract class AbstractTramMessageTest {
+
+  @Inject
+  private MessageConsumer messageConsumer;
+
+  @Test
+  public void shouldReceiveMessage() throws InterruptedException {
+    messageConsumer.subscribe(subscriberId, Collections.singleton(destination), this::handleMessage);
+    ...
+  }
+
+  private void handleMessage(Message message) {
+    ...
+  }
+}
+----
+
+See this example of https://github.com/eventuate-tram/eventuate-tram-core-micronaut-examples-basic/blob/master/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/messages/AbstractTramMessageTest.java[sending messages].
+
 === Transactional domain events
 
 The domain event package builds on the transaction messaging APIs.
@@ -151,6 +235,8 @@ The domain event package builds on the transaction messaging APIs.
 ==== Publishing domain events
 
 Publish domain events using the `DomainEventPublisher` interface:
+
+===== Spring
 
 [source,java]
 ----
@@ -182,6 +268,36 @@ public class AbstractTramEventTestConfiguration {
 
 See this example of https://github.com/eventuate-tram/eventuate-tram-core-examples-basic/blob/master/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/events/AbstractTramEventTest.java[transaction events].
 
+===== Micronaut
+
+[source,java]
+----
+public abstract class AbstractTramEventTest {
+
+  @Inject
+  private DomainEventPublisher domainEventPublisher;
+
+  @Test
+  public void shouldReceiveEvent() throws InterruptedException {
+    long uniqueId = config.getUniqueId();
+    String accountId = ...;
+
+    DomainEvent domainEvent = new AccountDebited(...);
+
+    domainEventPublisher.publish("Account", accountId, Collections.singletonList(domainEvent));
+----
+
+To publish events you need to have `TramEventsPublisherFactory` class in your classpath (see <<dependency-configuration-section, dependency configuration section>>):
+
+```groovy
+dependencies {
+    compile "io.eventuate.tram.core:eventuate-tram-micronaut-events:$eventuateTramVersion"
+}
+```
+
+
+See this example of https://github.com/eventuate-tram/eventuate-tram-core-micronaut-examples-basic/blob/master/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/events/AbstractTramEventTest.java[transaction events].
+
 ==== Consuming domain events
 
 First, define `DomainEventHandlers`:
@@ -204,7 +320,9 @@ public class TramEventTestEventConsumer {
 }
 ----
 
-Second, configure a `DomainEventDispatcher` `@Bean`:
+Second, configure a `DomainEventDispatcher`:
+
+===== Spring
 
 [source,java]
 ----
@@ -227,6 +345,30 @@ public class AbstractTramEventTestConfiguration {
 
 See this example of https://github.com/eventuate-tram/eventuate-tram-core-examples-basic/blob/master/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/events/AbstractTramEventTest.java[transaction events].
 
+===== Micronaut
+
+[source,java]
+----
+@Factory
+public class AbstractTramEventTestFactory {
+
+  @Context
+  public DomainEventDispatcher domainEventDispatcher(AbstractTramEventTestConfig config,
+                                                     TramEventTestEventConsumer target,
+                                                     DomainEventDispatcherFactory domainEventDispatcherFactory) {
+    return domainEventDispatcherFactory.make("eventDispatcherId" + config.getUniqueId(), target.domainEventHandlers());
+  }
+
+  @Singleton
+  public TramEventTestEventConsumer tramEventTestTarget(AbstractTramEventTestConfig config) {
+    return new TramEventTestEventConsumer(config.getAggregateType());
+  }
+}
+----
+
+See this example of https://github.com/eventuate-tram/eventuate-tram-core-micronaut-examples-basic/blob/master/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/events/AbstractTramEventTestFactory.java[transaction events].
+
+
 === Transactional commands
 
 Transactional commands are implemented using transactional messaging.
@@ -234,6 +376,8 @@ Transactional commands are implemented using transactional messaging.
 ==== Sending commands
 
 Send a command using a `CommandProducer`:
+
+===== Spring
 
 [source,java]
 ----
@@ -271,6 +415,42 @@ messageConsumer.subscribe(subscriberId, "ReplyToChannel", this::handleMessage);
 
 See this example of https://github.com/eventuate-tram/eventuate-tram-core-examples-basic/blob/master/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/commands/AbstractTramCommandTest.java[transactional commands].
 
+===== Micronaut
+
+[source,java]
+----
+public abstract class AbstractTramCommandTest {
+
+  @Inject
+  private CommandProducer commandProducer;
+
+  @Test
+  public void shouldInvokeCommand() throws InterruptedException {
+
+    String commandId = commandProducer.send("CustomerCommandChannel",
+            new DoSomethingCommand(),
+            "ReplyToChannel",
+            Collections.emptyMap());
+
+----
+
+You also need to have the `TramCommandProducerFactory` in your classpath (see <<dependency-configuration-section, dependency configuration section>>):
+
+```groovy
+dependencies {
+    compile "io.eventuate.tram.core:eventuate-tram-micronaut-commands:$eventuateTramVersion"
+}
+```
+
+To handle a reply message, simply subscribe to the `ReplyChannel`.
+
+[source,java]
+----
+messageConsumer.subscribe(subscriberId, "ReplyToChannel", this::handleMessage);
+----
+
+See this example of https://github.com/eventuate-tram/eventuate-tram-core-micronaut-examples-basic/blob/master/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/commands/AbstractTramCommandTest.java[transactional commands].
+
 ==== Handling commands
 
 First, define `CommandHandlers`:
@@ -293,7 +473,9 @@ public class TramCommandTestCommandHandler {
   }
 ----
 
-Second, define a `CommandDispatcher` `@Bean`:
+Second, define a `CommandDispatcher`:
+
+===== Spring
 
 [source,java]
 ----
@@ -313,10 +495,33 @@ public TramCommandTestCommandHandler abstractTramCommandTestTarget(AbstractTramC
 }
 ----
 
-See this example of https://github.com/eventuate-tram/eventuate-tram-core-examples-basic/blob/master/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/commands/AbstractTramCommandTest.java[transactional commands].
+===== Micronaut
+
+[source,java]
+----
+@Factory
+public class AbstractTramCommandTestFactory {
+
+  @Singleton
+  public TramCommandTestCommandHandler abstractTramCommandTestTarget(AbstractTramCommandTestConfig config) {
+    return new TramCommandTestCommandHandler(config.getCommandChannel());
+  }
+
+  @Singleton
+  public CommandDispatcher commandDispatcher(CommandDispatcherFactory commandDispatcherFactory,
+                                             AbstractTramCommandTestConfig config,
+                                             TramCommandTestCommandHandler target) {
+    return commandDispatcherFactory.make(config.getCommandDispatcheId(), target.getCommandHandlers());
+  }
+}
+----
+
+See this example of https://github.com/eventuate-tram/eventuate-tram-core-micronaut-examples-basic/blob/master/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/commands/AbstractTramCommandTest.java[transactional commands].
 
 
 === Configuring the transport
+
+===== Spring
 
 You also need to configure the transport mechanism, specifically the message broker.
 You do this importing one of the `TramJdbc<MessageBroker>Configuration` classes:
@@ -352,11 +557,19 @@ To consumer a consumer, `@Import` one of the `EventuateTram<MessageBroker>Messag
 
 For example, see the FTGO application's https://github.com/microservices-patterns/ftgo-application/blob/master/ftgo-order-history-service/src/main/java/net/chrisrichardson/ftgo/cqrs/orderhistory/main/OrderHistoryServiceMain.java[`Order History Service`], which is a consumer-only service.
 
+===== Micronaut
+
+For now only kafka is support for micronaut.
+
+You don't need to create additional configuration, you only need to setup dependencies (see <<dependency-configuration-section, dependency configuration section>>):
+
 === Configuration properties
 
 There are various configuration properties that need to be set for each transport.
 
 Since JDBC is used, you must set the usual properties, such as:
+
+===== Spring
 
 ----
 spring.datasource.url=jdbc:mysql://${DOCKER_HOST_IP}/eventuate
@@ -365,8 +578,21 @@ spring.datasource.password=mysqlpw
 spring.datasource.driver.class.name=com.mysql.jdbc.driver
 ----
 
+===== Micronaut
+
+----
+datasources:
+  default:
+    url: dbc:mysql://${DOCKER_HOST_IP}/eventuate
+    driverClassName: com.mysql.jdbc.driver
+    username: mysqluser
+    password: mysqlpw
+----
+
 
 In addition, you need to define message broker-specific properties.
+
+===== Spring
 
 [cols="25%, 75%", options="header"]
 |===
@@ -402,12 +628,36 @@ eventuate.redis.partitions=...
 
 |===
 
+See spring https://github.com/eventuate-tram/eventuate-tram-core-examples-basic/blob/master/eventuate-tram-examples-jdbc-kafka/src/test/resources/application.properties[application.properties]
 
-See https://github.com/eventuate-tram/eventuate-tram-core-examples-basic/blob/master/eventuate-tram-examples-jdbc-kafka/src/test/resources/application.properties[application.properties]
+===== Micronaut
+
+[cols="25%, 75%", options="header"]
+|===
+| Message Broker
+| Properties
+
+| Apache Kafka
+a|
+----
+eventuatelocal:
+  kafka:
+    bootstrap:
+      servers: ${DOCKER_HOST_IP}:9092
+  zookeeper:
+    connection:
+      string: ${DOCKER_HOST_IP}:2181
+----
+|===
+
+
+See micronaut https://github.com/eventuate-tram/eventuate-tram-core-micronaut-examples-basic/blob/master/eventuate-tram-examples-jdbc-kafka/src/test/resources/application.yml[application.yml]
 
 ==== In-memory transport
 
-If you want to use JDBC/Apache Kafka `@Import` `TramInMemoryConfiguration`:
+===== Spring
+
+If you want to use in-memory transport `@Import` `TramInMemoryConfiguration`:
 
 [source,java]
 ----
@@ -418,6 +668,15 @@ public class TramInMemoryConfiguration {
 }
 ----
 
+===== Micronaut
+
+If you want to use in-memory transport include eventuate-tram-micronaut-in-memory dependency:
+
+```groovy
+dependencies {
+    compile "io.eventuate.tram.core:eventuate-tram-micronaut-in-memory:$eventuateTramVersion"
+}
+```
 
 === Running the CDC service
 
