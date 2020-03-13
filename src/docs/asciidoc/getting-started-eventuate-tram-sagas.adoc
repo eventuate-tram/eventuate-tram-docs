@@ -25,7 +25,7 @@ To learn more:
 
 === JavaDocs
 
-* See the https://eventuate.io/docs/docs/javadoc/eventuate-tram-sagas/eventuate-tram-sagas.html[Eventuate Tram Sagas JavaDocs]
+* See the https://eventuate.io/docs/javadoc/eventuate-tram-sagas/eventuate-tram-sagas.html[Eventuate Tram Sagas JavaDocs]
 
 === Example applications:
 
