@@ -23,6 +23,10 @@ And, the following message brokers:
 * The https://github.com/eventuate-tram/eventuate-tram-sagas[Eventuate Tram Sagas Github repository]
 * The https://www.manning.com/books/microservices-patterns[Microservices Patterns] book
 
+=== JavaDocs
+
+* See the [Eventuate Tram JavaDocs](/docs/javadoc/eventuate-tram/eventuate-tram.html)
+
 === Project setup
 
 Latest library version:

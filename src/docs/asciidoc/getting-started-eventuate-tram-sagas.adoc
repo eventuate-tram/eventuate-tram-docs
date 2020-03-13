@@ -23,7 +23,11 @@ To learn more:
 * See this https://www.slideshare.net/chris.e.richardson/yow2018-events-and-commands-developing-asynchronous-microservices[presentation]
 * The https://www.manning.com/books/microservices-patterns[Microservices Patterns book]
 
-Example applications:
+=== JavaDocs
+
+* See the [Eventuate Tram Sagas JavaDocs](/docs/docs/javadoc/eventuate-tram-sagas/eventuate-tram-sagas.html)
+
+=== Example applications:
 
 * https://github.com/eventuate-tram/eventuate-tram-sagas-examples-customers-and-orders[Customers and Orders]
 * https://github.com/microservice-patterns/ftgo-application[FTGO Example application for Microservice Patterns book]
