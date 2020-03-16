@@ -7,12 +7,12 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - eventuate-tram-docs-{{ checksum "gradle.properties" }}
+            - eventuate-tram-docs-{{ checksum "build.gradle" }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
             - eventuate-tram-docs-
       - run: TERM=dumb ./gradlew asciidoctor
       - save_cache:
           paths:
             - ~/.gradle
-          key: eventuate-tram-docs-{{ checksum "gradle.properties" }}
+          key: eventuate-tram-docs-{{ checksum "build.gradle" }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
       - store_artifacts:
           path: ~/build/asciidoc/html5
