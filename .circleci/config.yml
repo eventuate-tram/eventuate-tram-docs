@@ -1,0 +1,18 @@
+version: 2
+jobs:
+  build:
+    machine: true
+    working_directory: ~/eventuate-tram-docs
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - eventuate-tram-docs-{{ checksum "gradle.properties" }}
+            - eventuate-tram-docs-
+      - run: TERM=dumb ./gradlew asciidoctor
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: eventuate-tram-docs-{{ checksum "gradle.properties" }}
+      - store_artifacts:
+          path: ~/build/asciidoc/html5
