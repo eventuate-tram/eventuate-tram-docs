@@ -15,4 +15,4 @@ jobs:
             - ~/.gradle
           key: eventuate-tram-docs-{{ checksum "build.gradle" }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
       - store_artifacts:
-          path: ~/build/asciidoc/html5
+          path: ~/eventuate-tram-docs/build/asciidoc/html5
