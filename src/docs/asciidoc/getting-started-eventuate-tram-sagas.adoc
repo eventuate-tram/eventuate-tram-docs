@@ -66,20 +66,43 @@ repositories {
 
 If you are writing a Saga orchestrator add this dependency to your project:
 
-* `io.eventuate.tram.sagas:eventuate-tram-sagas-simple-dsl:$eventuateTramSagasVersion`
+===== Spring
+
+* `io.eventuate.tram.sagas:eventuate-tram-sagas-spring-orchestration-simple-dsl:$eventuateTramSagasVersion`
+
+===== Micronaut
+
+* `io.eventuate.tram.sagas:eventuate-tram-sagas-micronaut-orchestration-simple-dsl:$eventuateTramSagasVersion`
 
 If you are writing a saga participant then add this dependency:
 
-* `io.eventuate.tram.sagas:eventuate-jpa-sagas-framework:$eventuateTramSagasVersion`
+===== Spring
+
+* `io.eventuate.tram.sagas:eventuate-tram-sagas-spring-participant:$eventuateTramSagasVersion`
+
+===== Micronaut
+
+* `io.eventuate.tram.sagas:eventuate-tram-sagas-micronaut-participant:$eventuateTramSagasVersion`
+
 
 You must also include one of the https://github.com/eventuate-tram/eventuate-tram-core[Eventuate Tram] 'implementation' artifacts:
 
-* `io.eventuate.tram.core:eventuate-tram-jdbc-kafka:$eventuateTramVersion` - JDBC database and Apache Kafka message broker
-* `io.eventuate.tram.core:eventuate-tram-in-memory:$eventuateTramVersion` - In-memory JDBC database and in-memory messaging for testing
+===== Spring
+
+* `io.eventuate.tram.core:eventuate-tram-spring-jdbc-kafka:$eventuateTramVersion` - JDBC database and Apache Kafka message broker
+* `io.eventuate.tram.core:eventuate-tram-jdbc-activemq:$eventuateTramVersion` - JDBC database and Apache ActiveMQ message broker
+* `io.eventuate.tram.core:eventuate-tram-jdbc-rabbitmq:$eventuateTramVersion` - JDBC database and RabbitMQ message broker
+* `io.eventuate.tram.core:eventuate-tram-jdbc-redis:$eventuateTramVersion` - JDBC database and Redis message broker
+* `io.eventuate.tram.core:eventuate-tram-spring-in-memory:$eventuateTramVersion` - In-memory JDBC database and in-memory messaging for testing
+
+===== Micronaut
+
+* `io.eventuate.tram.core:eventuate-tram-micronaut-jdbc-kafka:$eventuateTramVersion` - JDBC database and Apache Kafka message broker
+* `io.eventuate.tram.core:eventuate-tram-micronaut-in-memory:$eventuateTramVersion` - In-memory JDBC database and in-memory messaging for testing
 
 ==== Writing an orchestrator
 
-The https://github.com/eventuate-tram/eventuate-tram-sagas-examples-customers-and-orders[Customers and Orders] uses a saga to create an `Order` in the `Order Service` and reserve credit in the `Customer Service`.
+The https://github.com/eventuate-tram/eventuate-tram-sagas-examples-customers-and-orders[Customers and Orders (Spring)] uses a saga to create an `Order` in the `Order Service` and reserve credit in the `Customer Service`.
 The `CreateOrderSaga` consists of the following three steps:
 
 1. The `CreateOrderSaga` is instantiated after the `Order` is created.
@@ -88,6 +111,8 @@ Consequently, the first step is simply a compensating transaction, which is exec
 If the reservation is success, the next step is executed.
 Otherwise, the compensating transactions are executed to roll back the saga.
 3. Approves the order, if the credit is reserved.
+
+https://github.com/eventuate-tram-examples/eventuate-tram-sagas-micronaut-examples-customers-and-orders[Micronaut version of Customers and Orders]
 
 ===== Writing the saga orchestrator class
 
@@ -129,6 +154,8 @@ The `reserveCredit()` creates a message to send to the `Customer Service` to res
 
 The `OrderService` creates the saga:
 
+===== Spring
+
 ```java
 public class OrderService {
 
@@ -151,9 +178,32 @@ public class OrderService {
 }
 ```
 
+===== Micronaut
+
+```java
+public class OrderService {
+
+  @Inject
+  private SagaManager<CreateOrderSagaData> createOrderSagaManager;
+
+  @PersistenceContext
+  private EntityManager entityManager;
+
+  @Transactional
+  public Order createOrder(OrderDetails orderDetails) {
+    CreateOrderSagaData data = new CreateOrderSagaData(orderDetails);
+    createOrderSagaManager.create(data);
+    return entityManager.find(Order.class, data.getOrderId());
+  }
+
+}
+```
+
 ==== Writing a saga participant
 
 Here is the  `CustomerCommandHandler`, which handles the command to reserve credit:
+
+===== Spring
 
 ```java
 public class CustomerCommandHandler {
@@ -174,6 +224,28 @@ public class CustomerCommandHandler {
   ...
 ```
 
+===== Micronaut
+
+```java
+public class CustomerCommandHandler {
+
+  @PersistenceContext
+  private EntityManager entityManager;
+
+  public CommandHandlers commandHandlerDefinitions() {
+    return SagaCommandHandlersBuilder
+            .fromChannel("customerService")
+            .onMessage(ReserveCreditCommand.class, this::reserveCredit)
+            .build();
+  }
+
+  public Message reserveCredit(CommandMessage<ReserveCreditCommand> cm) {
+     ...
+  }
+
+}
+  ...
+```
 
 ==== Running the CDC service
 
@@ -181,4 +253,4 @@ In addition to a database and message broker, you will need to run the Eventuate
 It reads messages and events inserted into the database and publishes them to Apache Kafka.
 It is written using Spring Boot.
 The easiest way to run this service during development is to use Docker Compose.
-The https://github.com/eventuate-tram/eventuate-tram-core-examples-basic[Eventuate Tram Code Basic examples] project has an example https://github.com/eventuate-tram/eventuate-tram-core-examples-basic/blob/master/docker-compose.yml[docker-compose.yml file].
+The https://github.com/eventuate-tram/eventuate-tram-core-examples-basic[Eventuate Tram Code Basic examples] project has an example https://github.com/eventuate-tram/eventuate-tram-core-examples-basic/blob/master/docker-compose-mysql-binlog.yml[docker-compose.yml file].
