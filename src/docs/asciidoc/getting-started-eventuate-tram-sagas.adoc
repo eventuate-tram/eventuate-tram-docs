@@ -68,8 +68,7 @@ If you are writing a Saga orchestrator add this dependency to your project:
 
 ===== Micronaut
 
-* `io.eventuate.tram.sagas:eventuate-tram-sagas-orchestration-simple-dsl:$eventuateTramSagasVersion`
-* `io.eventuate.tram.sagas:eventuate-tram-sagas-micronaut-orchestration:$eventuateTramSagasVersion`
+* `io.eventuate.tram.sagas:eventuate-tram-sagas-micronaut-orchestration-simple-dsl:$eventuateTramSagasVersion`
 
 If you are writing a saga participant then add this dependency:
 
@@ -87,19 +86,15 @@ You must also include one of the https://github.com/eventuate-tram/eventuate-tra
 ===== Spring
 
 * `io.eventuate.tram.core:eventuate-tram-spring-jdbc-kafka:$eventuateTramVersion` - JDBC database and Apache Kafka message broker
+* `io.eventuate.tram.core:eventuate-tram-jdbc-activemq:$eventuateTramVersion` - JDBC database and Apache ActiveMQ message broker
+* `io.eventuate.tram.core:eventuate-tram-jdbc-rabbitmq:$eventuateTramVersion` - JDBC database and RabbitMQ message broker
+* `io.eventuate.tram.core:eventuate-tram-jdbc-redis:$eventuateTramVersion` - JDBC database and Redis message broker
 * `io.eventuate.tram.core:eventuate-tram-spring-in-memory:$eventuateTramVersion` - In-memory JDBC database and in-memory messaging for testing
 
 ===== Micronaut
 
-JDBC database and Apache Kafka message broker
-
-* `io.eventuate.tram.core:eventuate-tram-micronaut-producer-jdbc:$eventuateTramVersion`
-* `io.eventuate.tram.core:eventuate-tram-micronaut-consumer-kafka`
-* `io.eventuate.tram.core:eventuate-tram-micronaut-consumer-jdbc:$eventuateTramVersion`
-
-In-memory JDBC database and in-memory messaging for testing
-
-* `io.eventuate.tram.core:eventuate-tram-micronaut-in-memory:$eventuateTramVersion`
+* `io.eventuate.tram.core:eventuate-tram-micronaut-jdbc-kafka:$eventuateTramVersion` - JDBC database and Apache Kafka message broker
+* `io.eventuate.tram.core:eventuate-tram-micronaut-in-memory:$eventuateTramVersion` - In-memory JDBC database and in-memory messaging for testing
 
 ==== Writing an orchestrator
 

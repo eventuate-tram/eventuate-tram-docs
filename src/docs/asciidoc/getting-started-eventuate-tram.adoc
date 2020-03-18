@@ -91,7 +91,7 @@ dependencies {
 
   // Use in-memory messaging transport for testing
 
-  testCompile "io.eventuate.tram.core:eventuate-tram-in-memory:$eventuateTramVersion"
+  testCompile "io.eventuate.tram.core:eventuate-tram-spring-in-memory:$eventuateTramVersion"
 
 }
 ```
@@ -118,16 +118,13 @@ For now only kafka is supported as transport mechanism:
 
 ```groovy
 dependencies {
-    // Use JDBC and Apache Kafka as the underlying messaging transport
+  // Use JDBC and Apache Kafka as the underlying messaging transport
 
-    // Sending messages via database
-    compile "io.eventuate.tram.core:eventuate-tram-micronaut-producer-jdbc:$eventuateTramVersion"
+  compile "io.eventuate.tram.core:eventuate-tram-micronaut-jdbc-kafka:$eventuateTramVersion"
 
-    // Kafka message consumer
-    compile "io.eventuate.tram.core:eventuate-tram-micronaut-consumer-kafka:$eventuateTramVersion"
+  // Use in-memory messaging transport for testing
 
-    // Transactional message consuming / duplicate messaging detenction
-    compile "io.eventuate.tram.core:eventuate-tram-micronaut-consumer-jdbc:$eventuateTramVersion"
+  testCompile "io.eventuate.tram.core:eventuate-tram-micronaut-in-memory:$eventuateTramVersion"
 
 }
 ```
