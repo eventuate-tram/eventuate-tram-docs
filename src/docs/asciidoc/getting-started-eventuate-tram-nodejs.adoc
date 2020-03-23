@@ -39,13 +39,16 @@ Send a message using `MessageProducer`:
 
 [source,javascript]
 ----
+const knex = require('../lib/mysql/knex');
 const { MessageProducer } = require('eventuate-tram-core-nodejs');
 const messageProducer = new MessageProducer();
 const topic = 'test-topic';
 
 const payload = { message: 'Test message' };
 const message = { payload, headers: { PARTITION_ID: 0 }};
-await messageProducer.send(topic, message);
+const trx = await knex.transaction();
+await messageProducer.send(topic, message, trx);
+await trx.commit();
 ----
 
 See this example of https://github.com/eventuate-tram/eventuate-tram-core-nodejs/blob/master/test/MessageProducer-spec.js[sending messages].
@@ -63,8 +66,8 @@ const topic = 'test-topic';
 const subscriberId = 'test-message-consumer-sb-id';
 
 await messageConsumer.subscribe({ subscriberId, topics: [ topic ], messageHandler: (message) => {
-  console.log(message);
-  return Promise.resolve();
+    console.log(message);
+    return Promise.resolve();
 }});
 ----
 
@@ -80,30 +83,57 @@ Publish domain events using `DomainEventPublisher`:
 
 [source,javascript]
 ----
-const knex = require('knex') ({
-  client: 'mysql',
-  connection: { ... },
-  debug: true,
-  pool: { min: 0, max: 10 }
-});
+const knex = require('../lib/mysql/knex');
 
-const { DefaultChannelMapping, MessageProducer, DomainEventPublisher } = require('eventuate-tram-core-nodejs');
-const channelMapping = new DefaultChannelMapping(new Map());
-const messageProducer = new MessageProducer({ channelMapping });
+const { MessageProducer, DomainEventPublisher } = require('eventuate-tram-core-nodejs');
+const messageProducer = new MessageProducer();
 const domainEventPublisher = new DomainEventPublisher({ messageProducer });
-let extraHeaders = {};
 
 const aggregateType = 'Account';
 const aggregateId = 'Fake_aggregate_id';
 const events = [
-  { amount: 10, _type: 'CreditApproved' },
-  { amount: 20, _type: 'CreditApproved' },
-  { amount: 30, _type: 'CreditApproved' },
-  { amount: 40, _type: 'CreditApproved' },
+    { amount: 10, _type: 'CreditApproved' },
+    { amount: 20, _type: 'CreditApproved' },
+    { amount: 30, _type: 'CreditApproved' },
+    { amount: 40, _type: 'CreditApproved' },
 ];
 
 const trx = await knex.transaction();
-await domainEventPublisher.publish(aggregateType, aggregateId, events, { extraHeaders, trx });
+await domainEventPublisher.publish(aggregateType, aggregateId, events, { trx });
+await trx.commit();
+----
+
+And with custom channel mapping:
+[source,javascript]
+----
+const knex = require('../lib/mysql/knex');
+const { MessageProducer, DomainEventPublisher } = require('eventuate-tram-core-nodejs');
+
+class CustomChannelMapping {
+    constructor() {
+        // map "CustomerAccount" aggregate type to "Account"
+        this.mappings = new Map([['CustomerAccount', 'Account']]);
+    }
+    transform(channel) {
+        const mappingChannel = this.mappings.get(channel);
+        return mappingChannel || channel;
+    }
+}
+
+const messageProducer = new MessageProducer({ channelMapping: new CustomChannelMapping() });
+const domainEventPublisher = new DomainEventPublisher({ messageProducer });
+
+const aggregateType = 'Account';
+const aggregateId = 'Fake_aggregate_id';
+const events = [
+    { amount: 10, _type: 'CreditApproved' },
+    { amount: 20, _type: 'CreditApproved' },
+    { amount: 30, _type: 'CreditApproved' },
+    { amount: 40, _type: 'CreditApproved' },
+];
+
+const trx = await knex.transaction();
+await domainEventPublisher.publish(aggregateType, aggregateId, events, { trx });
 await trx.commit();
 ----
 
@@ -121,28 +151,54 @@ const aggregateType = 'Account';
 const eventType = 'CreditApproved';
 
 const domainEventHandlers = {
-        [aggregateType]: {
-          [eventType]: async (event) => {
+    [aggregateType]: {
+        [eventType]: async (event) => {
             console.log(event);
-          }
         }
-      };
+    }
+  };
 ----
 
 Second, configure a `DomainEventDispatcher`:
 
 [source,javascript]
 ----
-const { MessageConsumer, DefaultDomainEventNameMapping, DomainEventDispatcher } = require('eventuate-tram-core-nodejs');
+const { MessageConsumer, DomainEventDispatcher } = require('eventuate-tram-core-nodejs');
 
-const domainEventNameMapping = new DefaultDomainEventNameMapping();
+const messageConsumer = new MessageConsumer();
+const eventDispatcherId = 'test-domain-event-dispatcher-id';
+
+domainEventDispatcher = new DomainEventDispatcher({ eventDispatcherId, domainEventHandlers, messageConsumer });
+await domainEventDispatcher.initialize();
+----
+
+Same with custom domain event mapping:
+
+[source,javascript]
+----
+const { MessageConsumer, DomainEventDispatcher } = require('eventuate-tram-core-nodejs');
+
+class CustomerDomainEventNameMapping {
+    constructor() {
+        this.mappings = {
+            [aggregateType]: new Map([[eventType, 'CustomerCreditApproved']])
+        };
+    }
+    externalEventTypeToEvent(aggregateType, eventTypeHeader) {
+        if (this.mappings[aggregateType]) {
+            return this.mappings[aggregateType].get(eventTypeHeader);
+        }
+        throw new Error('Unknown aggregate type');
+    }
+}
+
 const messageConsumer = new MessageConsumer();
 const eventDispatcherId = 'test-domain-event-dispatcher-id';
 
 domainEventDispatcher = new DomainEventDispatcher({ eventDispatcherId,
     domainEventHandlers,
     messageConsumer,
-    domainEventNameMapping
+    domainEventNameMapping: new CustomerDomainEventNameMapping()
 });
 await domainEventDispatcher.initialize();
 ----
