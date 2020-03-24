@@ -27,7 +27,7 @@ And, the following message brokers:
 
 Latest library version:
 
-[![npm version](https://badge.fury.io/js/eventuate-tram-core-nodejs.svg)](http://npmjs.com/package/eventuate-tram-core-nodejs)
+image::https://badge.fury.io/js/eventuate-tram-core-nodejs.svg[link="http://npmjs.com/package/eventuate-tram-core-nodejs"]
 
 === Transactional messages
 
