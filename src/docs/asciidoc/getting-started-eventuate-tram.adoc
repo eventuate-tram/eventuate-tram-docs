@@ -53,7 +53,7 @@ repositories {
 }
 ```
 
-Include one or more of the following dependencies, depending on which API you want to use.
+Include one or more of the following dependencies, depending on which API and implementation you want to use.
 
 ===== API artifacts
 
@@ -77,9 +77,7 @@ where
 
 * `framework` is `spring` or `micronaut`
 
-You also need to pick a transport mechanism.
-
-===== Producer transport artifact
+===== Producer implementation artifact
 
 If your service is a producer, you must add this dependency:
 
@@ -93,9 +91,9 @@ dependencies {
 }
 ```
 
-===== Consumer transport artifacts
+===== Consumer implementation artifacts
 
-If your service is a consumer, you must add this dependency:
+If your service is a consumer, you must add a message broker-specific dependency:
 
 ```groovy
 dependencies {
