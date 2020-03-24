@@ -27,7 +27,7 @@ And, the following message brokers:
 
 Latest library version:
 
-[![NPM Version][npm-image]][npm-url]
+[![npm version](https://badge.fury.io/js/eventuate-tram-core-nodejs.svg)](http://npmjs.com/package/eventuate-tram-core-nodejs)
 
 === Transactional messages
 
@@ -44,14 +44,15 @@ const { MessageProducer } = require('eventuate-tram-core-nodejs');
 const messageProducer = new MessageProducer();
 const topic = 'test-topic';
 
-const payload = { message: 'Test message' };
-const message = { payload, headers: { PARTITION_ID: 0 }};
+const payload = { message: 'Test kafka subscription' };
+const message = { payload, headers: { PARTITION_ID: 0, DATE: new Date().getTime() }};
+
 const trx = await knex.transaction();
 await messageProducer.send(topic, message, trx);
 await trx.commit();
 ----
 
-See this example of https://github.com/eventuate-tram/eventuate-tram-core-nodejs/blob/master/test/MessageProducer-spec.js[sending messages].
+See this example of https://github.com/eventuate-tram/eventuate-tram-core-nodejs/blob/master/test/MessageProducer-spec.js#L34-L39[sending messages].
 
 ==== Consuming messages
 
@@ -65,13 +66,10 @@ const messageConsumer = new MessageConsumer();
 const topic = 'test-topic';
 const subscriberId = 'test-message-consumer-sb-id';
 
-await messageConsumer.subscribe({ subscriberId, topics: [ topic ], messageHandler: (message) => {
-    console.log(message);
-    return Promise.resolve();
-}});
+await messageConsumer.subscribe({ subscriberId, topics: [topic], messageHandler: async message => resolve() });
 ----
 
-See this example of https://github.com/eventuate-tram/eventuate-tram-core-nodejs/blob/master/test/MessageConsumer-spec.js[consuming messages].
+See this example of https://github.com/eventuate-tram/eventuate-tram-core-nodejs/blob/master/test/MessageConsumer-spec.js#L39[consuming messages].
 
 === Transactional domain events
 
@@ -137,7 +135,7 @@ await domainEventPublisher.publish(aggregateType, aggregateId, events, { trx });
 await trx.commit();
 ----
 
-See this example of https://github.com/eventuate-tram/eventuate-tram-core-nodejs/blob/master/test/DomainEventPublisher-spec.js[Publishing events].
+See this example of https://github.com/eventuate-tram/eventuate-tram-core-nodejs/blob/master/test/DomainEventPublisher-spec.js#L65-L81[Publishing events].
 
 
 ==== Consuming domain events
@@ -203,7 +201,7 @@ domainEventDispatcher = new DomainEventDispatcher({ eventDispatcherId,
 await domainEventDispatcher.initialize();
 ----
 
-See this example of https://github.com/eventuate-tram/eventuate-tram-core-nodejs/blob/master/test/DomainEventDispatcher-spec.js[Dispatching domain events].
+See this example of https://github.com/eventuate-tram/eventuate-tram-core-nodejs/blob/master/test/DomainEventDispatcher-spec.js#L65-L84[Dispatching domain events].
 
 === Configuring the transport
 
