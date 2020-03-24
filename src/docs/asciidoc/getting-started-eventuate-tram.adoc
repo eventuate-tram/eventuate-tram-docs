@@ -229,6 +229,135 @@ public abstract class AbstractTramMessageTest {
 
 See this example of https://github.com/eventuate-tram/eventuate-tram-core-micronaut-examples-basic/blob/master/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/messages/AbstractTramMessageTest.java[sending messages].
 
+==== Message interceptors
+
+Eventuate Tram implements message interceptors.
+Your service can define one or more message interceptors to inject custom logic into the various message processing steps.
+It could, for example, add custom headers to a message.
+
+A message interceptor must implement the `MessageInterceptor` interface.
+
+```java
+public interface MessageInterceptor {
+
+  default void preSend(Message message) {}
+  default void postSend(Message message, Exception e) {}
+
+  default void preReceive(Message message) {}
+  default void preHandle(String subscriberId, Message message) {}
+  default void postHandle(String subscriberId, Message message, Throwable throwable) {}
+  default void postReceive(Message message) {}
+
+}
+```
+
+==== Message handler decorators
+
+Eventuate Tram implements message handler decorators.
+They are equivalent to Servlet Filters and are invoked when handling a message.
+Eventuate Tram uses them to implement message consumer mechanisms such as idempotency and optimistic locking.
+Your service can also define custom decorators.
+
+`MessageHandlerDecorator` is the interface that message handler decorators must implement:
+
+```
+public interface MessageHandlerDecorator
+     extends BiConsumer<SubscriberIdAndMessage, MessageHandlerDecoratorChain> {
+  int getOrder();
+}
+```
+
+The `@MessageHandlerDecorator``'s in the `ApplicationContext` are executed in the order defined by `getOrder()`.
+
+==== Idempotent message consumers
+
+A message broker might deliver the same message more than once.
+A message consumer must typically be https://microservices.io/patterns/communication-style/idempotent-consumer.html[idempotent].
+Some message consumers are naturally idempotent, e.g. `account.balance = event.newBalance`, and can be invoked repeatedly without error.
+But others are not - e.g. `account.balance += event.amount` - and must be made idempotent by tracking the messages that they have consumed.
+
+Eventuate Tram has an pluggable duplicate message detection mechanism.
+`DuplicateMessageDetector` is the strategy interface.
+There are the following concrete implementations:
+
+* `SqlTableBasedDuplicateMessageDetector` - tracks successfully processed message IDs in a `RECEIVED_MESSAGES` tables.
+Your message handling logic is executed within a transaction managed by this class.
+* `NoopDuplicateMessageDetector` - does nothing.
+Use this implementation when your message handlers are idempotent.
+For example, the https://github.com/microservices-patterns/ftgo-application/blob/9f85c7744bfa2d58a2a9aefbb3b9eb43428df3ec/ftgo-order-history-service/src/main/java/net/chrisrichardson/ftgo/cqrs/orderhistory/messaging/OrderHistoryServiceMessagingConfiguration.java#L15[`Order History Service`] in the FTGO application tracks message IDs in a Dynamodb table
+* `TransactionalNoopDuplicateMessageDetector` - it doesn't track message IDs but it does manage transactions.
+
+.A note about transaction management
+****
+If you use a `DuplicateMessageDetector` that manages transactions then you must not manage transactions (e.g. use `@Transactional`) in your message handlers.
+****
+
+Your service's `ApplicationContext` must define an `DuplicateMessageDetector` `@Bean`.
+
+===== Spring
+
+[cols="10%a,30%a,30%a,30%a"]
+|===
+
+|
+| `SqlTableBasedDuplicateMessageDetector`
+| `TransactionalNoopDuplicateMessageDetector`
+| `NoopDuplicateMessageDetector`
+
+| Dependency
+| `eventuate-tram-spring-consumer-jdbc` directly or indirectly via `eventuate-tram-spring-jdbc-<message-broker>`
+| `eventuate-tram-spring-consumer-jdbc` directly or indirectly via `eventuate-tram-spring-jdbc-<message-spring-jdbc-<message-broker>`
+| -
+
+| `@Configuration`
+| Either auto-configuration or `@Import` `TramConsumerJdbcAutoConfiguration`
+| `@Import` `TransactionalNoopDuplicateMessageDetectorConfiguration`
+| `@Import` `NoopDuplicateMessageDetector`
+
+|===
+
+
+
+===== Micronaut
+
+
+[cols="10%a,30%a,30%a,30%a"]
+|===
+
+|
+| `SqlTableBasedDuplicateMessageDetector`
+| `TransactionalNoopDuplicateMessageDetector`
+| `NoopDuplicateMessageDetector`
+
+| Dependency
+| `eventuate-tram-micronaut-consumer-jdbc` directly or indirectly via `eventuate-tram-micronaut-jdbc-<message-broker>`
+| `eventuate-tram-micronaut-consumer-jdbc` directly or indirectly via `eventuate-tram-micronaut-jdbc-<message-micronaut-jdbc-<message-broker>`
+| -
+
+| Configuration
+| do not set `transactional.noop.duplicate.message.detector.factory.enabled`
+| set `transactional.noop.duplicate.message.detector.factory.enabled`
+| The default if no other `DuplicateMessageDetector` `@Bean` is defined
+
+|===
+
+==== Optimistic locking
+
+If your application uses a `DuplicateMessageDetector` that manages transactions and your message handler uses optimistic locking then you must configure Eventuate Tram to retry the transaction when an optimistic locking failure occurs.
+
+==== Spring
+
+To configure retries, you must:
+
+* Add `eventuate-tram-optimistic-locking` as a dependency
+* `@Import` `OptimisticLockingDecoratorConfiguration`
+
+This configures an `OptimisticLockingDecorator` `@Bean`, which is a `MessageHandlerDecorator` that retries when an `OptimisticLockingFailureException` is thrown.
+
+==== Micronaut
+
+Not yet implemented: https://github.com/eventuate-tram/eventuate-tram-core/issues/96[Issue #46]
+
 === Transactional domain events
 
 The domain event package builds on the transaction messaging APIs.
@@ -256,7 +385,7 @@ public abstract class AbstractTramEventTest {
     domainEventPublisher.publish("Account", accountId, Collections.singletonList(domainEvent));
 ----
 
-To publish events you need to `@Import` the `TramEventsPublisherConfiguration.class` `@Configuration` class:
+To publish events you need to `@Import` the `TramEventsPublisherConfiguration` `@Configuration` class:
 
 [source,java]
 ----
