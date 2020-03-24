@@ -1,6 +1,7 @@
 [[getting-started]]
 == Getting started with Eventuate Tram
 
+
 Learn how to get started with https://github.com/eventuate-tram/eventuate-tram-core[Eventuate Tram], a framework for transactional messaging.
 Eventuate Tram sends and receives messages as part of a database transaction ensuring that your application atomically updates the database and publishes messages.
 Currently, it supports the following databases:
@@ -52,86 +53,106 @@ repositories {
 }
 ```
 
-Include one or more of the following dependencies, depending on which API you want to use:
+Include one or more of the following dependencies, depending on which API you want to use.
 
-===== Spring
+===== API artifacts
 
 ```groovy
 dependencies {
 
   // Basic messaging
 
-  compile "io.eventuate.tram.core:eventuate-tram-spring-messaging:$eventuateTramVersion"
+  compile "io.eventuate.tram.core:eventuate-tram-<framework>-messaging:$eventuateTramVersion"
 
   // Domain events
 
-  compile "io.eventuate.tram.core:eventuate-tram-spring-events:$eventuateTramVersion"
+  compile "io.eventuate.tram.core:eventuate-tram-<framework>-events:$eventuateTramVersion"
 
   // Command/Async Reply messaging
 
-  compile "io.eventuate.tram.core:eventuate-tram-spring-commands:$eventuateTramVersion"
+  compile "io.eventuate.tram.core:eventuate-tram-<framework>-commands:$eventuateTramVersion"
 ```
 
-You also need to pick a transport mechanism:
+where
+
+* `framework` is `spring` or `micronaut`
+
+You also need to pick a transport mechanism.
+
+===== Producer transport artifact
+
+If your service is a producer, you must add this dependency:
 
 ```groovy
 dependencies {
 
-  // Use JDBC and Apache Kafka as the underlying messaging transport
+  // Producer implementation
 
-  compile "io.eventuate.tram.core:eventuate-tram-spring-jdbc-kafka:$eventuateTramVersion"
-
-  // Use JDBC and Apache ActiveMQ as the underlying messaging transport
-
-  compile "io.eventuate.tram.core:eventuate-tram-jdbc-activemq:$eventuateTramVersion"
-
-  // Use JDBC and RabbitMQ as the underlying messaging transport
-
-  compile "io.eventuate.tram.core:eventuate-tram-jdbc-rabbitmq:$eventuateTramVersion"
-
-  // Use JDBC and Redis Streams as the underlying messaging transport
-
-  compile "io.eventuate.tram.core:eventuate-tram-jdbc-redis:$eventuateTramVersion"
-
-  // Use in-memory messaging transport for testing
-
-  testCompile "io.eventuate.tram.core:eventuate-tram-spring-in-memory:$eventuateTramVersion"
+  compile "io.eventuate.tram.core:eventuate-tram-<framework>-producer-jdbc:$eventuateTramVersion"
 
 }
 ```
 
-===== Micronaut
-[[dependency-configuration-section]]
-```groovy
-dependencies {
+===== Consumer transport artifacts
 
-  // Basic messaging
-
-  compile "io.eventuate.tram.core:eventuate-tram-micronaut-messaging:$eventuateTramVersion"
-
-  // Domain events
-
-  compile "io.eventuate.tram.core:eventuate-tram-micronaut-events:$eventuateTramVersion"
-
-  // Command/Async Reply messaging
-
-  compile "io.eventuate.tram.core:eventuate-tram-micronaut-commands:$eventuateTramVersion"
-```
-
-For now, the Micronaut version of Eventuate only supports Apache Kafka as the transport mechanism:
+If your service is a consumer, you must add this dependency:
 
 ```groovy
 dependencies {
-  // Use JDBC and Apache Kafka as the underlying messaging transport
 
-  compile "io.eventuate.tram.core:eventuate-tram-micronaut-jdbc-kafka:$eventuateTramVersion"
+  // Consumer implementation
 
-  // Use in-memory messaging transport for testing
-
-  testCompile "io.eventuate.tram.core:eventuate-tram-micronaut-in-memory:$eventuateTramVersion"
+  compile "io.eventuate.tram.core:eventuate-tram-<framework>-consumer-<message-broker>:$eventuateTramVersion"
 
 }
 ```
+
+where
+
+* `framework` is `spring` or `micronaut`
+* `message-broker` is `kafka`, `apachemq`, `rabbitmq` or `redis`.
+
+Note: `micronaut` only supports `kafka`
+
+If you want to use JDBC-based idempotency (see below) also include this dependency:
+
+```groovy
+dependencies {
+
+  // Consumer idempotency
+
+  compile "io.eventuate.tram.core:eventuate-tram-<framework>-consumer-jdbc:$eventuateTramVersion"
+
+}
+```
+
+where
+
+* `framework` is `spring` or `micronaut`
+
+See below for more details.
+
+===== All-in-one artifacts
+
+If you need all of the above artifacts, then you can include this one dependency:
+
+```groovy
+dependencies {
+
+  // Consumer/Producer all-in-one
+
+  compile "io.eventuate.tram.core:eventuate-tram-<framework>-jdbc-<message-broker>:$eventuateTramVersion"
+
+}
+```
+
+where
+
+* `framework` is `spring` or `micronaut`
+* `message-broker` is `kafka`, `apachemq`, `rabbitmq` or `redis`.
+
+Note: `micronaut` only supports `kafka`
+
 
 === Transactional messages
 
@@ -296,7 +317,7 @@ Your service's `ApplicationContext` must define an `DuplicateMessageDetector` `@
 
 ===== Spring
 
-[cols="10%a,30%a,30%a,30%a"]
+[cols="4*a"]
 |===
 
 |
@@ -305,8 +326,8 @@ Your service's `ApplicationContext` must define an `DuplicateMessageDetector` `@
 | `NoopDuplicateMessageDetector`
 
 | Dependency
-| `eventuate-tram-spring-consumer-jdbc` directly or indirectly via `eventuate-tram-spring-jdbc-<message-broker>`
-| `eventuate-tram-spring-consumer-jdbc` directly or indirectly via `eventuate-tram-spring-jdbc-<message-spring-jdbc-<message-broker>`
+| `eventuate-tram-spring-consumer-jdbc` (or indirectly via `eventuate-tram-spring-jdbc-<message-broker>`)
+| `eventuate-tram-spring-consumer-jdbc` (or indirectly via `eventuate-tram-spring-jdbc-<message-spring-jdbc-<message-broker>`)
 | -
 
 | `@Configuration`
@@ -321,7 +342,7 @@ Your service's `ApplicationContext` must define an `DuplicateMessageDetector` `@
 ===== Micronaut
 
 
-[cols="10%a,30%a,30%a,30%a"]
+[cols="4*a"]
 |===
 
 |

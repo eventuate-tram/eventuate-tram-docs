@@ -1,5 +1,5 @@
 = Eventuate Tram documentation
-Copyright (c) 2019 Chris Richardson Consulting Inc. All rights reserved
+Copyright (c) 2020 Chris Richardson Consulting Inc. All rights reserved
 
 The reference documentation consists of the following sections:
 
