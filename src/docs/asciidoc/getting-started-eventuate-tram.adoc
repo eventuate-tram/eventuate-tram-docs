@@ -39,25 +39,27 @@ image::https://api.bintray.com/packages/eventuateio-oss/eventuate-maven-rc/event
 
 In `gradle.properties`:
 
-```
+----
 eventuateTramVersion=LATEST_VERSION
-```
+----
 
 In `build.gradle`, specify these maven repositories:
 
 
-```groovy
+[source, groovy]
+----
 repositories {
     mavenCentral()
     jcenter()
 }
-```
+----
 
 Include one or more of the following dependencies, depending on which API and implementation you want to use.
 
 ===== API artifacts
 
-```groovy
+[source, groovy]
+----
 dependencies {
 
   // Basic messaging
@@ -71,7 +73,7 @@ dependencies {
   // Command/Async Reply messaging
 
   compile "io.eventuate.tram.core:eventuate-tram-<framework>-commands:$eventuateTramVersion"
-```
+----
 
 where
 
@@ -81,7 +83,8 @@ where
 
 If your service is a producer, you must add this dependency:
 
-```groovy
+[source, groovy]
+----
 dependencies {
 
   // Producer implementation
@@ -89,13 +92,14 @@ dependencies {
   compile "io.eventuate.tram.core:eventuate-tram-<framework>-producer-jdbc:$eventuateTramVersion"
 
 }
-```
+----
 
 ===== Consumer implementation artifacts
 
 If your service is a consumer, you must add a message broker-specific dependency:
 
-```groovy
+[source, groovy]
+----
 dependencies {
 
   // Consumer implementation
@@ -103,7 +107,7 @@ dependencies {
   compile "io.eventuate.tram.core:eventuate-tram-<framework>-consumer-<message-broker>:$eventuateTramVersion"
 
 }
-```
+----
 
 where
 
@@ -114,7 +118,8 @@ Note: `micronaut` only supports `kafka`
 
 If you want to use JDBC-based idempotency (see below) also include this dependency:
 
-```groovy
+[source, groovy]
+----
 dependencies {
 
   // Consumer idempotency
@@ -122,7 +127,7 @@ dependencies {
   compile "io.eventuate.tram.core:eventuate-tram-<framework>-consumer-jdbc:$eventuateTramVersion"
 
 }
-```
+----
 
 where
 
@@ -134,7 +139,8 @@ See below for more details.
 
 If you need all of the above artifacts, then you can include this one dependency:
 
-```groovy
+[source, groovy]
+----
 dependencies {
 
   // Consumer/Producer all-in-one
@@ -142,7 +148,7 @@ dependencies {
   compile "io.eventuate.tram.core:eventuate-tram-<framework>-jdbc-<message-broker>:$eventuateTramVersion"
 
 }
-```
+----
 
 where
 
@@ -256,7 +262,8 @@ It could, for example, add custom headers to a message.
 
 A message interceptor must implement the `MessageInterceptor` interface.
 
-```java
+[source, java]
+----
 public interface MessageInterceptor {
 
   default void preSend(Message message) {}
@@ -268,7 +275,7 @@ public interface MessageInterceptor {
   default void postReceive(Message message) {}
 
 }
-```
+----
 
 ==== Message handler decorators
 
@@ -279,12 +286,12 @@ Your service can also define custom decorators.
 
 `MessageHandlerDecorator` is the interface that message handler decorators must implement:
 
-```
+----
 public interface MessageHandlerDecorator
      extends BiConsumer<SubscriberIdAndMessage, MessageHandlerDecoratorChain> {
   int getOrder();
 }
-```
+----
 
 The `@MessageHandlerDecorator``'s in the `ApplicationContext` are executed in the order defined by `getOrder()`.
 
@@ -450,11 +457,12 @@ public abstract class AbstractTramEventTest {
 
 To publish events you need to have `TramEventsPublisherFactory` class in your classpath (see <<dependency-configuration-section, dependency configuration section>>):
 
-```groovy
+[source, groovy]
+----
 dependencies {
     compile "io.eventuate.tram.core:eventuate-tram-micronaut-events:$eventuateTramVersion"
 }
-```
+----
 
 
 See this example of https://github.com/eventuate-tram/eventuate-tram-core-micronaut-examples-basic/blob/master/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/events/AbstractTramEventTest.java[transaction events].
@@ -597,11 +605,12 @@ public abstract class AbstractTramCommandTest {
 
 You also need to have the `TramCommandProducerFactory` in your classpath (see <<dependency-configuration-section, dependency configuration section>>):
 
-```groovy
+[source, groovy]
+----
 dependencies {
     compile "io.eventuate.tram.core:eventuate-tram-micronaut-commands:$eventuateTramVersion"
 }
-```
+----
 
 To handle a reply message, simply subscribe to the `ReplyChannel`.
 
@@ -833,11 +842,12 @@ public class TramInMemoryConfiguration {
 
 If you want to use in-memory transport include eventuate-tram-micronaut-in-memory dependency:
 
-```groovy
+[source, groovy]
+----
 dependencies {
     compile "io.eventuate.tram.core:eventuate-tram-micronaut-in-memory:$eventuateTramVersion"
 }
-```
+----
 
 === Running the CDC service
 

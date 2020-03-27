@@ -50,18 +50,19 @@ image::https://api.bintray.com/packages/eventuateio-oss/eventuate-maven-rc/event
 
 In `gradle.properties`:
 
-```
+----
 eventuateTramSagasVersion=LATEST_VERSION
-```
+----
 
 In `build.gradle`, specify these maven repositories:
 
-```groovy
+[source, groovy]
+----
 repositories {
     mavenCentral()
     jcenter()
 }
-```
+----
 
 ===== Saga orchestrator dependencies
 
@@ -69,23 +70,25 @@ If you are writing a Saga orchestrator add this dependency to your project:
 
 Spring:
 
-```groovy
+[source, groovy]
+----
 dependency {
 
   compile "io.eventuate.tram.sagas:eventuate-tram-sagas-spring-orchestration-simple-dsl:$eventuateTramSagasVersion"
 
 }
-```
+----
 
 Micronaut:
 
-```groovy
+[source, groovy]
+----
 dependency {
 
   compile "io.eventuate.tram.sagas:eventuate-tram-sagas-micronaut-orchestration-simple-dsl:$eventuateTramSagasVersion"
 
 }
-```
+----
 
 ===== Saga participant dependencies
 
@@ -93,29 +96,32 @@ If you are writing a saga participant then add this dependency:
 
 Spring:
 
-```groovy
+[source, groovy]
+----
 dependency {
 
   compile "io.eventuate.tram.sagas:eventuate-tram-sagas-spring-participant:$eventuateTramSagasVersion"
 
 }
-```
+----
 
 Micronaut:
 
-```groovy
+[source, groovy]
+----
 dependency {
 
   compile "io.eventuate.tram.sagas:eventuate-tram-sagas-micronaut-participant:$eventuateTramSagasVersion"
 
 }
-```
+----
 
 ===== Eventuate Tram dependencies
 
 You must also include one of the https://github.com/eventuate-tram/eventuate-tram-core[Eventuate Tram] 'implementation' artifacts:
 
-```groovy
+[source, groovy]
+----
 dependencies {
 
   compile "io.eventuate.tram.core:eventuate-tram-<framework>-producer-jdbc:$eventuateTramVersion"
@@ -129,7 +135,7 @@ dependencies {
   testCompile "io.eventuate.tram.sagas:eventuate-tram-sagas-spring-testing-support:$eventuateTramSagasVersion"
 
 }
-```
+----
 
 where
 
@@ -156,7 +162,8 @@ https://github.com/eventuate-tram-examples/eventuate-tram-sagas-micronaut-exampl
 
 Here is part of the definition of `CreateOrderSaga`.
 
-```java
+[source, java]
+----
 public class CreateOrderSaga implements SimpleSaga<CreateOrderSagaData> {
 
   private SagaDefinition<CreateOrderSagaData> sagaDefinition =
@@ -184,7 +191,7 @@ public class CreateOrderSaga implements SimpleSaga<CreateOrderSagaData> {
             .build();
 
 ...
-```
+----
 
 The `reserveCredit()` creates a message to send to the `Customer Service` to reserve credit.
 
@@ -216,7 +223,8 @@ The `OrderService` creates the saga using `SagaInstanceFactory`:
 
 ====== Spring
 
-```java
+[source, java]
+----
 public class OrderService {
 
   @Autowired
@@ -238,11 +246,12 @@ public class OrderService {
   }
 
 }
-```
+----
 
 ====== Micronaut
 
-```java
+[source, java]
+----
 public class OrderService {
 
   @Inject
@@ -259,7 +268,7 @@ public class OrderService {
   }
 
 }
-```
+----
 
 ==== Writing a saga participant
 
@@ -267,7 +276,8 @@ Here is the  `CustomerCommandHandler`, which handles the command to reserve cred
 
 ===== Spring
 
-```java
+[source, java]
+----
 public class CustomerCommandHandler {
 
   @Autowired
@@ -284,11 +294,12 @@ public class CustomerCommandHandler {
      ...
   }
   ...
-```
+----
 
 ===== Micronaut
 
-```java
+[source, java]
+----
 public class CustomerCommandHandler {
 
   @PersistenceContext
@@ -307,7 +318,7 @@ public class CustomerCommandHandler {
 
 }
   ...
-```
+----
 
 ==== Configuring the application context for a saga participant
 

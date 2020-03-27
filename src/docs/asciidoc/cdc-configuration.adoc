@@ -299,12 +299,12 @@ See, for example, https://github.com/microservices-patterns/ftgo-application/[FT
 A reader is defined using Spring framework properties that obey the following naming convention: `eventuate.cdc.reader.<reader name>.<property name>`.
 For example, you can configure a reader called `READER1` using environment variables such as these:
 
-```
+----
 EVENTUATE_CDC_READER_READER1_TYPE: mysql-binlog
 EVENTUATE_CDC_READER_READER1_DATASOURCEURL: jdbc:mysql://${DOCKER_HOST_IP}:3306/eventuate
 EVENTUATE_CDC_READER_READER1_DATASOURCEUSERNAME: mysqluser
 ...
-```
+----
 
 A reader has the properties shown in the following table.
 
@@ -429,11 +429,11 @@ If polling fails, reader will try again using the specified interval.
 A pipeline is configured using Spring framework properties that obey the following naming convention: `eventuate.cdc.pipeline.<pipeline name>.<property name>`.
 For example, you can configure a pipeline called `PIPELINE1` using environment variables such as these:
 
-```
+----
 EVENTUATE_CDC_PIPELINE_PIPELINE1_TYPE: eventuate-local
 EVENTUATE_CDC_PIPELINE_PIPELINE1_READER: reader1
 ...
-```
+----
 
 A pipeline has the properties shown in the following table.
 
@@ -795,13 +795,13 @@ The upgrade process consists of the following steps:
 
 You will need to update the database schema with a script similar to:
 
-```
+----
 CREATE TABLE cdc_monitoring (reader_id VARCHAR(1000) PRIMARY KEY, last_time BIGINT);
 CREATE TABLE offset_store(client_name VARCHAR(255) NOT NULL PRIMARY KEY, serialized_offset VARCHAR(255));
 
 ALTER TABLE message ADD creation_time BIGINT;
 ALTER TABLE received_messages ADD creation_time BIGINT;
-```
+----
 
 This script creates two new tables and adds the `creation_time` column to the messaging tables.
 
@@ -933,7 +933,7 @@ For example, the https://github.com/microservices-patterns/ftgo-application/[FTG
 | Before
 | After
 
-| ```
+| ----
 tram-cdc-service:
   image: eventuateio/eventuate-tram-cdc-mysql-service:0.11.1.RELEASE
   ….
@@ -969,9 +969,9 @@ eventuate-local-cdc-service:
     EVENTUATELOCAL_CDC_BINLOG_CLIENT_ID: 1
     EVENTUATELOCAL_CDC_MY_SQL_BIN_LOG_CLIENT_NAME: ClientEventuateLocal
     EVENTUATELOCAL_CDC_DB_HISTORY_TOPIC_NAME: db.history.eventuate.local
-```
+----
 
-| ```
+| ----
 tram-cdc-service:
   image: eventuateio/eventuate-cdc-service:LATEST_VERSION
   ….
@@ -1010,7 +1010,7 @@ tram-cdc-service:
     EVENTUATE_CDC_READER_READER2_READOLDDEBEZIUMDBOFFSETSTORAGETOPIC: "false"
     EVENTUATE_CDC_READER_READER2_OFFSETSTORAGETOPICNAME: db.history.eventuate.tram
     EVENTUATE_CDC_READER_READER2_OFFSETSTOREKEY: ClientEventuateTram
-```
+----
 
 |===
 
