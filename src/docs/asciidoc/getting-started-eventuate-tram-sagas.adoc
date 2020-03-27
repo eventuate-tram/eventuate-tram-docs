@@ -46,7 +46,7 @@ There are four parts to using Eventuate Tram Saga to implement an orchestration-
 The artifacts are in https://bintray.com/eventuateio-oss/eventuate-maven-rc/eventuate-tram-sagas[Eventuate Maven Release Candidate Repository].
 The latest version is:
 
-image::https://api.bintray.com/packages/eventuateio-oss/eventuate-maven-release/eventuate-tram-sagas/images/download.svg[link="https://bintray.com/eventuateio-oss/eventuate-maven-release/eventuate-tram-sagas/_latestVersion"]
+image::https://api.bintray.com/packages/eventuateio-oss/eventuate-maven-rc/eventuate-tram-sagas/images/download.svg[link="https://bintray.com/eventuateio-oss/eventuate-maven-rc/eventuate-tram-sagas/_latestVersion"][link="https://bintray.com/eventuateio-oss/eventuate-maven-release/eventuate-tram-sagas/_latestVersion"]
 
 In `gradle.properties`:
 
@@ -63,42 +63,80 @@ repositories {
 }
 ```
 
+===== Saga orchestrator dependencies
 
 If you are writing a Saga orchestrator add this dependency to your project:
 
-===== Spring
+Spring:
 
-* `io.eventuate.tram.sagas:eventuate-tram-sagas-spring-orchestration-simple-dsl:$eventuateTramSagasVersion`
+```groovy
+dependency {
 
-===== Micronaut
+  compile "io.eventuate.tram.sagas:eventuate-tram-sagas-spring-orchestration-simple-dsl:$eventuateTramSagasVersion"
 
-* `io.eventuate.tram.sagas:eventuate-tram-sagas-micronaut-orchestration-simple-dsl:$eventuateTramSagasVersion`
+}
+```
+
+Micronaut:
+
+```groovy
+dependency {
+
+  compile "io.eventuate.tram.sagas:eventuate-tram-sagas-micronaut-orchestration-simple-dsl:$eventuateTramSagasVersion"
+
+}
+```
+
+===== Saga participant dependencies
 
 If you are writing a saga participant then add this dependency:
 
-===== Spring
+Spring:
 
-* `io.eventuate.tram.sagas:eventuate-tram-sagas-spring-participant:$eventuateTramSagasVersion`
+```groovy
+dependency {
 
-===== Micronaut
+  compile "io.eventuate.tram.sagas:eventuate-tram-sagas-spring-participant:$eventuateTramSagasVersion"
 
-* `io.eventuate.tram.sagas:eventuate-tram-sagas-micronaut-participant:$eventuateTramSagasVersion`
+}
+```
 
+Micronaut:
+
+```groovy
+dependency {
+
+  compile "io.eventuate.tram.sagas:eventuate-tram-sagas-micronaut-participant:$eventuateTramSagasVersion"
+
+}
+```
+
+===== Eventuate Tram dependencies
 
 You must also include one of the https://github.com/eventuate-tram/eventuate-tram-core[Eventuate Tram] 'implementation' artifacts:
 
-===== Spring
+```groovy
+dependencies {
 
-* `io.eventuate.tram.core:eventuate-tram-spring-jdbc-kafka:$eventuateTramVersion` - JDBC database and Apache Kafka message broker
-* `io.eventuate.tram.core:eventuate-tram-jdbc-activemq:$eventuateTramVersion` - JDBC database and Apache ActiveMQ message broker
-* `io.eventuate.tram.core:eventuate-tram-jdbc-rabbitmq:$eventuateTramVersion` - JDBC database and RabbitMQ message broker
-* `io.eventuate.tram.core:eventuate-tram-jdbc-redis:$eventuateTramVersion` - JDBC database and Redis message broker
-* `io.eventuate.tram.core:eventuate-tram-spring-in-memory:$eventuateTramVersion` - In-memory JDBC database and in-memory messaging for testing
+  compile "io.eventuate.tram.core:eventuate-tram-<framework>-producer-jdbc:$eventuateTramVersion"
+  compile "io.eventuate.tram.core:eventuate-tram-<framework>-consumer-<message-broker>:$eventuateTramVersion"
 
-===== Micronaut
+  // In-memory JDBC database and in-memory messaging for testing
+  testCompile `io.eventuate.tram.core:eventuate-tram-<framework>-in-memory:$eventuateTramVersion`
 
-* `io.eventuate.tram.core:eventuate-tram-micronaut-jdbc-kafka:$eventuateTramVersion` - JDBC database and Apache Kafka message broker
-* `io.eventuate.tram.core:eventuate-tram-micronaut-in-memory:$eventuateTramVersion` - In-memory JDBC database and in-memory messaging for testing
+  // Saga orchestrator only
+
+  testCompile "io.eventuate.tram.sagas:eventuate-tram-sagas-spring-testing-support:$eventuateTramSagasVersion"
+
+}
+```
+
+where
+
+* `framework` is `spring` or `micronaut`
+* `message-broker` is `kafka`, `apachemq`, `rabbitmq` or `redis`.
+
+Note: `micronaut` only supports `kafka`
 
 ==== Writing an orchestrator
 
@@ -150,17 +188,39 @@ public class CreateOrderSaga implements SimpleSaga<CreateOrderSagaData> {
 
 The `reserveCredit()` creates a message to send to the `Customer Service` to reserve credit.
 
+===== Configuring the application context for a saga orchestrator
+
+====== Spring
+
+[source,java]
+----
+@Configuration
+...
+@Import({SagaOrchestratorConfiguration.class,
+...
+TramMessageProducerJdbcConfiguration.class,
+EventuateTramKafkaMessageConsumerConfiguration.class
+})
+public class OrderConfiguration {
+...
+----
+
+====== Micronaut
+
+TBD
+
+
 ===== Creating an saga orchestrator
 
-The `OrderService` creates the saga:
+The `OrderService` creates the saga using `SagaInstanceFactory`:
 
-===== Spring
+====== Spring
 
 ```java
 public class OrderService {
 
   @Autowired
-  private SagaManager<CreateOrderSagaData> createOrderSagaManager;
+  private SagaInstanceFactory sagaInstanceFactory;
 
   @Autowired
   private OrderRepository orderRepository;
@@ -171,20 +231,22 @@ public class OrderService {
     Order order = oe.result;
     orderRepository.save(order);
     CreateOrderSagaData data = new CreateOrderSagaData(order.getId(), orderDetails);
-    createOrderSagaManager.create(data, Order.class, order.getId());
+
+    sagaInstanceFactory.create(createOrderSaga, data);
+
     return order;
   }
 
 }
 ```
 
-===== Micronaut
+====== Micronaut
 
 ```java
 public class OrderService {
 
   @Inject
-  private SagaManager<CreateOrderSagaData> createOrderSagaManager;
+  private SagaInstanceFactory sagaInstanceFactory;
 
   @PersistenceContext
   private EntityManager entityManager;
@@ -192,7 +254,7 @@ public class OrderService {
   @Transactional
   public Order createOrder(OrderDetails orderDetails) {
     CreateOrderSagaData data = new CreateOrderSagaData(orderDetails);
-    createOrderSagaManager.create(data);
+    sagaInstanceFactory.create(createOrderSaga, data);
     return entityManager.find(Order.class, data.getOrderId());
   }
 
@@ -246,6 +308,29 @@ public class CustomerCommandHandler {
 }
   ...
 ```
+
+==== Configuring the application context for a saga participant
+
+===== Spring
+
+[source, java]
+----
+@Configuration
+@Import({
+  SagaParticipantConfiguration.class,
+  ...
+  TramMessageProducerJdbcConfiguration.class,
+  EventuateTramKafkaMessageConsumerConfiguration.class
+})
+...
+@EnableAutoConfiguration
+public class CustomerConfiguration {
+  ....
+----
+
+===== Micronaut
+
+TBD
 
 ==== Running the CDC service
 

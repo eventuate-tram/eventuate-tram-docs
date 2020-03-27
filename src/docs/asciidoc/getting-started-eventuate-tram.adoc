@@ -335,7 +335,12 @@ Your service's `ApplicationContext` must define an `DuplicateMessageDetector` `@
 
 |===
 
-
+[source,groovy]
+----
+dependency {
+  compile "io.eventuate.tram.core:eventuate-tram-spring-consumer-jdbc:$eventuateTramVersion"
+}
+----
 
 ===== Micronaut
 
@@ -359,6 +364,13 @@ Your service's `ApplicationContext` must define an `DuplicateMessageDetector` `@
 | The default if no other `DuplicateMessageDetector` `@Bean` is defined
 
 |===
+
+[source,groovy]
+----
+dependency {
+  compile "io.eventuate.tram.core:eventuate-tram-micronaut-consumer-jdbc:$eventuateTramVersion"
+}
+----
 
 ==== Optimistic locking
 
