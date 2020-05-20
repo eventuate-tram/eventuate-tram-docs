@@ -471,7 +471,6 @@ See this example of https://github.com/eventuate-tram/eventuate-tram-core-micron
 
 First, define `DomainEventHandlers`:
 
-[source,java]
 ----
 public class TramEventTestEventConsumer {
 
@@ -493,17 +492,16 @@ Second, configure a `DomainEventDispatcher`:
 
 ===== Spring
 
-[source,java]
 ----
 @Configuration
 public class AbstractTramEventTestConfiguration {
 
   @Bean
-  public DomainEventDispatcher domainEventDispatcher(DomainEventDispatcherFactory domainEventDispatcherFactory,,
+  public DomainEventDispatcher domainEventDispatcher(DomainEventDispatcherFactory domainEventDispatcherFactory,
                                                      AbstractTramEventTestConfig config,
                                                      TramEventTestEventConsumer target) {
-    return domainEventDispatcherFactory.make("eventDispatcherId",
-            target.domainEventHandlers());
+    return domainEventDispatcherFactory.make("eventDispatcherId" + config.getUniqueId(),
+                                             target.domainEventHandlers());
   }
 
   @Bean
@@ -656,7 +654,8 @@ public class AbstractTramCommandTestConfiguration {
   public CommandDispatcher commandDispatcher(CommandDispatcherFactory commandDispatcherFactory,
                                              AbstractTramCommandTestConfig config,
                                              AbstractTramCommandTestCommandHandler target) {
-  return commandDispatcherFactory.make("customerServiceCommandDispatcher", target.getCommandHandlers());
+  return commandDispatcherFactory.make("customerServiceCommandDispatcher",
+                                       target.getCommandHandlers());
 }
 
 @Bean
