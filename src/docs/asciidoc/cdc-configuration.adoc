@@ -610,19 +610,15 @@ To publish messages to RabbitMQ, please enable the `RabbitMQ` Spring profile usi
 | Description
 | Default Value
 
-| rabbitmq.host
+| rabbitmq.url
 | Host of the RabbitMQ server.
 Example: 172.17.0.1
-| -
-
-| rabbitmq.port
-| Port of the RabbitMQ server
 | -
 
 | eventuate.rabbitmq.partition.count
 | Number of partitions. Messages are split between partitions similar to Apache Kafka.
 Partition is selected depending on message key hash. Processing of messages with the same partitions are ordered.
-| -
+| 2
 
 |===
 
