@@ -157,6 +157,24 @@ where
 
 Note: `micronaut` only supports `kafka`
 
+=== Eventuate Bom
+
+It is not necessary to specify artifact versions if use eventuate bom, it will resolve them automatically:
+
+[source, groovy]
+----
+dependencies {
+    implementation(platform("io.eventuate.platform:platform-dependencies:$eventuateBomVersion"))
+}
+----
+
+then version can be avoided:
+
+----
+dependencies {
+  compile "io.eventuate.tram.core:eventuate-tram-spring-messaging"
+}
+----
 
 === Transactional messages
 

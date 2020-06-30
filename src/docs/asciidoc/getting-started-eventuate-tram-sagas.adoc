@@ -144,6 +144,25 @@ where
 
 Note: `micronaut` only supports `kafka`
 
+=== Eventuate Bom
+
+It is not necessary to specify artifact versions if use eventuate bom, it will resolve them automatically:
+
+[source, groovy]
+----
+dependencies {
+    implementation(platform("io.eventuate.platform:platform-dependencies:$eventuateBomVersion"))
+}
+----
+
+then version can be avoided:
+
+----
+dependencies {
+  compile "io.eventuate.tram.sagas:eventuate-tram-sagas-micronaut-participant"
+}
+----
+
 ==== Writing an orchestrator
 
 The https://github.com/eventuate-tram/eventuate-tram-sagas-examples-customers-and-orders[Customers and Orders (Spring)] uses a saga to create an `Order` in the `Order Service` and reserve credit in the `Customer Service`.
