@@ -535,6 +535,10 @@ public class AbstractTramEventTestFactory {
 
 See this example of https://github.com/eventuate-tram/eventuate-tram-core-micronaut-examples-basic/blob/master/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/events/AbstractTramEventTestFactory.java[transaction events].
 
+Please note: if you want to have several dispatchers, you will need to use @Named annotation (https://docs.oracle.com/javaee/6/api/javax/inject/Named.html)
+on DomainEventDispatcher bean definitions. To initialize DomainEventDispatcher objects, eventuate framework iterates over all beans
+of that type and those beans should have unique names, otherwise only one of them will be retrieved from IoC container (micronaut specific behavior)
+without any explicit error.
 
 === Transactional commands
 
