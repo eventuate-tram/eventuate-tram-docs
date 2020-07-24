@@ -236,7 +236,6 @@ instead of explicit configuration importing is possible to use starters, just in
 [source, groovy]
 ----
 dependencies {
-  compile "io.eventuate.tram.core:eventuate-tram-spring-messaging-starter:$eventuateTramVersion"
   compile "io.eventuate.tram.sagas:eventuate-tram-sagas-spring-orchestration-simple-dsl-starter:$eventuateTramSagasVersion"
 }
 ----
@@ -373,7 +372,6 @@ instead of explicit configuration importing is possible to use starters, just in
 [source, groovy]
 ----
 dependencies {
-  compile "io.eventuate.tram.core:eventuate-tram-spring-messaging-starter:$eventuateTramVersion"
   compile "io.eventuate.tram.sagas:eventuate-tram-sagas-spring-participant-starter:$eventuateTramSagasVersion"
 }
 ----
