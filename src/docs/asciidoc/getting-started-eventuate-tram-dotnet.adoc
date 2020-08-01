@@ -1,0 +1,6 @@
+[[getting-started]]
+== Getting started with Eventuate Tram .NET
+
+The Eventuate Tram .NET documentation is currently work in progress.
+
+Please see https://github.com/eventuate-tram/eventuate-tram-core-dotnet[Eventuate Tram .NET].
