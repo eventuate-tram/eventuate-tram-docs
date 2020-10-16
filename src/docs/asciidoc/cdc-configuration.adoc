@@ -212,6 +212,8 @@ if you are using older version, there are migration scripts (just run sql in you
 * link: https://github.com/eventuate-foundation/eventuate-common/blob/master/postgres/5.initialize-database-db-id.sql[Postgres]
 * link: https://github.com/eventuate-foundation/eventuate-common/blob/master/mssql/4.setup-db-id.sql[MS SQL Server]
 
+PLEASE NOTE: ANY DATABASE PROCESSING SHOULD BE STOPPED
+
 Also, if you are using eventuate images since 0.13.0.RELEASE, please make sure, that you activated database id support
 by setting "USE_DB_ID_VARIABLE" to "true". For example:
 
