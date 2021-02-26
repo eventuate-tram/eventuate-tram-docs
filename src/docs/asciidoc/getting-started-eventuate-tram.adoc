@@ -40,11 +40,10 @@ Please note, that there are 2 library versions:
 
 Latest library version (spring/micronaut):
 
-//image::https://api.bintray.com/packages/eventuateio-oss/eventuate-maven-rc/eventuate-tram/images/download.svg[link="https://bintray.com/eventuateio-oss/eventuate-maven-rc/eventuate-tram/_latestVersion"]
-
-TODO: Update (version with db id is not released)
-
-image::https://api.bintray.com/packages/eventuateio-oss/eventuate-maven-rc/eventuate-tram/images/download.svg[link="https://bintray.com/eventuateio-oss/eventuate-maven-rc/eventuate-tram/_latestVersion"]
+|===
+| Release a| image::https://api.bintray.com/packages/eventuateio-oss/eventuate-maven-release/eventuate-tram/images/download.svg[link="https://bintray.com/eventuateio-oss/eventuate-maven-release/eventuate-tram/_latestVersion"]
+| RC a| image::https://api.bintray.com/packages/eventuateio-oss/eventuate-maven-rc/eventuate-tram/images/download.svg[link="https://bintray.com/eventuateio-oss/eventuate-maven-rc/eventuate-tram/_latestVersion"]
+|===
 
 Latest library version (quarkus):
 
@@ -59,7 +58,7 @@ In `gradle.properties`:
 eventuateTramVersion=LATEST_VERSION
 ----
 
-In `build.gradle`, specify these maven repositories:
+In `build.gradle`, specify these Maven repositories:
 
 [source, groovy]
 ----

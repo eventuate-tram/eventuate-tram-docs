@@ -43,10 +43,13 @@ There are four parts to using Eventuate Tram Saga to implement an orchestration-
 
 ==== Maven/Gradle artifacts
 
-The artifacts are in https://bintray.com/eventuateio-oss/eventuate-maven-rc/eventuate-tram-sagas[Eventuate Maven Release Candidate Repository].
-The latest version is:
+The latest versions are:
 
-image::https://api.bintray.com/packages/eventuateio-oss/eventuate-maven-rc/eventuate-tram-sagas/images/download.svg[link="https://bintray.com/eventuateio-oss/eventuate-maven-rc/eventuate-tram-sagas/_latestVersion"][link="https://bintray.com/eventuateio-oss/eventuate-maven-release/eventuate-tram-sagas/_latestVersion"]
+|===
+| Release a| image::https://api.bintray.com/packages/eventuateio-oss/eventuate-maven-release/eventuate-tram-sagas/images/download.svg[link="https://bintray.com/eventuateio-oss/eventuate-maven-release/eventuate-tram-sagas/_latestVersion"][link="https://bintray.com/eventuateio-oss/eventuate-maven-release/eventuate-tram-sagas/_latestVersion"]
+| RC a| image::https://api.bintray.com/packages/eventuateio-oss/eventuate-maven-rc/eventuate-tram-sagas/images/download.svg[link="https://bintray.com/eventuateio-oss/eventuate-maven-rc/eventuate-tram-sagas/_latestVersion"][link="https://bintray.com/eventuateio-oss/eventuate-maven-rc/eventuate-tram-sagas/_latestVersion"]
+|===
+
 
 In `gradle.properties`:
 
@@ -54,7 +57,7 @@ In `gradle.properties`:
 eventuateTramSagasVersion=LATEST_VERSION
 ----
 
-In `build.gradle`, specify these maven repositories:
+In `build.gradle`, specify these Maven repositories:
 
 [source, groovy]
 ----
