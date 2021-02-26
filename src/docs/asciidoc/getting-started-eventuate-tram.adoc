@@ -2,7 +2,7 @@
 == Getting started with Eventuate Tram
 
 
-Learn how to get started with https://github.com/eventuate-tram/eventuate-tram-core[Eventuate Tram], a framework for transactional messaging.
+Learn how to get started with https://github.com/eventuate-tram/eventuate-tram-core[Eventuate Tram](and https://github.com/eventuate-tram/eventuate-tram-core-quarkus[Eventuate Tram Quarkus]), a framework for transactional messaging.
 Eventuate Tram sends and receives messages as part of a database transaction ensuring that your application atomically updates the database and publishes messages.
 Currently, it supports the following databases:
 
@@ -21,7 +21,9 @@ And, the following message brokers:
 * link:./about-eventuate-tram.html[Overview of EventuateTram]
 * https://eventuate.io/exampleapps.html[Tram example applications]
 * The https://github.com/eventuate-tram/eventuate-tram-core[Eventuate Tram Github repository]
+* The https://github.com/eventuate-tram/eventuate-tram-core-quarkus[Eventuate Tram Quarkus Github repository]
 * The https://github.com/eventuate-tram/eventuate-tram-sagas[Eventuate Tram Sagas Github repository]
+* The https://github.com/eventuate-tram/eventuate-tram-sagas-quarkus[Eventuate Tram Sagas Quarkus Github repository]
 * The https://www.manning.com/books/microservices-patterns[Microservices Patterns] book
 
 === JavaDocs
@@ -30,9 +32,23 @@ And, the following message brokers:
 
 === Project setup
 
-Latest library version:
+Please note, that there are 2 library versions:
+
+1) for spring and micronaut
+
+2) for quarkus
+
+Latest library version (spring/micronaut):
+
+//image::https://api.bintray.com/packages/eventuateio-oss/eventuate-maven-rc/eventuate-tram/images/download.svg[link="https://bintray.com/eventuateio-oss/eventuate-maven-rc/eventuate-tram/_latestVersion"]
+
+TODO: Update (version with db id is not released)
 
 image::https://api.bintray.com/packages/eventuateio-oss/eventuate-maven-rc/eventuate-tram/images/download.svg[link="https://bintray.com/eventuateio-oss/eventuate-maven-rc/eventuate-tram/_latestVersion"]
+
+Latest library version (quarkus):
+
+TODO (Not released)
 
 ==== Gradle
 
@@ -44,7 +60,6 @@ eventuateTramVersion=LATEST_VERSION
 ----
 
 In `build.gradle`, specify these maven repositories:
-
 
 [source, groovy]
 ----
@@ -77,7 +92,7 @@ dependencies {
 
 where
 
-* `framework` is `spring` or `micronaut`
+* `framework` is `spring`, `micronaut` or `quarkus`
 
 ===== Producer implementation artifact
 
@@ -111,10 +126,10 @@ dependencies {
 
 where
 
-* `framework` is `spring` or `micronaut`
+* `framework` is `spring`, `micronaut` or `quarkus`
 * `message-broker` is `kafka`, `apachemq`, `rabbitmq` or `redis`.
 
-Note: `micronaut` only supports `kafka`
+Note: `micronaut` and `quarkus` only support `kafka`
 
 If you want to use JDBC-based idempotency (see below) also include this dependency:
 
@@ -131,7 +146,7 @@ dependencies {
 
 where
 
-* `framework` is `spring` or `micronaut`
+* `framework` is `spring`, `micronaut` or `quarkus`
 
 See below for more details.
 
@@ -152,10 +167,10 @@ dependencies {
 
 where
 
-* `framework` is `spring` or `micronaut`
+* `framework` is `spring`, `micronaut` or quarkus
 * `message-broker` is `kafka`, `apachemq`, `rabbitmq` or `redis`.
 
-Note: `micronaut` only supports `kafka`
+Note: `micronaut` and `quarkus` only support `kafka`
 
 === Eventuate Bom
 
@@ -203,7 +218,7 @@ public abstract class AbstractTramMessageTest {
 
 See this example of https://github.com/eventuate-tram/eventuate-tram-core-examples-basic/blob/master/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/messages/AbstractTramMessageTest.java[sending messages].
 
-===== Micronaut
+===== Micronaut/Quarkus
 
 [source,java]
 ----
@@ -220,7 +235,8 @@ public abstract class AbstractTramMessageTest {
   }
 ----
 
-See this example of https://github.com/eventuate-tram/eventuate-tram-core-micronaut-examples-basic/blob/master/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/messages/AbstractTramMessageTest.java[sending messages].
+See examples of https://github.com/eventuate-tram/eventuate-tram-core-micronaut-examples-basic/blob/master/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/messages/AbstractTramMessageTest.java[sending messages with micronaut] and
+https://github.com/eventuate-tram-examples/eventuate-tram-core-quarkus-examples-basic/blob/main/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/messages/AbstractTramMessageTest.java[sending messages with quarkus].
 
 ==== Consuming messages
 
@@ -249,7 +265,7 @@ public abstract class AbstractTramMessageTest {
 
 See this example of https://github.com/eventuate-tram/eventuate-tram-core-examples-basic/blob/master/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/messages/AbstractTramMessageTest.java[consuming messages].
 
-===== Micronaut
+===== Micronaut/Quarkus
 
 [source,java]
 ----
@@ -270,7 +286,8 @@ public abstract class AbstractTramMessageTest {
 }
 ----
 
-See this example of https://github.com/eventuate-tram/eventuate-tram-core-micronaut-examples-basic/blob/master/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/messages/AbstractTramMessageTest.java[sending messages].
+See examples of https://github.com/eventuate-tram/eventuate-tram-core-micronaut-examples-basic/blob/master/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/messages/AbstractTramMessageTest.java[consuming messages with micronaut] and
+https://github.com/eventuate-tram-examples/eventuate-tram-core-quarkus-examples-basic/blob/main/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/messages/AbstractTramMessageTest.java[consuming messages with quarkus]
 
 ==== Message interceptors
 
@@ -336,7 +353,7 @@ For example, the https://github.com/microservices-patterns/ftgo-application/blob
 If you use a `DuplicateMessageDetector` that manages transactions then you must not manage transactions (e.g. use `@Transactional`) in your message handlers.
 ****
 
-Your service's `ApplicationContext` must define an `DuplicateMessageDetector` `@Bean`.
+Your service's `ApplicationContext` must define an `DuplicateMessageDetector` bean.
 
 ===== Spring
 
@@ -380,20 +397,43 @@ dependency {
 
 | Dependency
 | `eventuate-tram-micronaut-consumer-jdbc` directly or indirectly via `eventuate-tram-micronaut-jdbc-<message-broker>`
-| `eventuate-tram-micronaut-consumer-jdbc` directly or indirectly via `eventuate-tram-micronaut-jdbc-<message-micronaut-jdbc-<message-broker>`
+| `eventuate-tram-micronaut-consumer-jdbc` directly or indirectly via `eventuate-tram-micronaut-jdbc-<message-broker>`
 | -
 
 | Configuration
 | do not set `transactional.noop.duplicate.message.detector.factory.enabled`
 | set `transactional.noop.duplicate.message.detector.factory.enabled`
-| The default if no other `DuplicateMessageDetector` `@Bean` is defined
+| The default if no other `DuplicateMessageDetector` bean is defined
+
+|===
+
+===== Quarkus
+
+
+[cols="4*a"]
+|===
+
+|
+| `SqlTableBasedDuplicateMessageDetector`
+| `TransactionalNoopDuplicateMessageDetector`
+| `NoopDuplicateMessageDetector`
+
+| Dependency
+| `eventuate-tram-quarkus-consumer-jdbc` directly or indirectly via `eventuate-tram-quarkus-jdbc-<message-broker>`
+| `eventuate-tram-quarkus-consumer-jdbc` directly or indirectly via `eventuate-tram-quarkus-jdbc-<message-broker>`
+| -
+
+| Configuration
+| do not set `transactional.noop.duplicate.message.detector.configuration.enabled`
+| set `transactional.noop.duplicate.message.detector.configuration.enabled`
+| The default if no other `DuplicateMessageDetector` bean is defined
 
 |===
 
 [source,groovy]
 ----
 dependency {
-  compile "io.eventuate.tram.core:eventuate-tram-micronaut-consumer-jdbc:$eventuateTramVersion"
+  compile "io.eventuate.tram.core:eventuate-tram-quarkus-consumer-jdbc:$eventuateTramVersion"
 }
 ----
 
@@ -405,14 +445,19 @@ If your application uses a `DuplicateMessageDetector` that manages transactions 
 
 To configure retries, you must:
 
-* Add `eventuate-tram-optimistic-locking` as a dependency
+* Add `eventuate-tram-spring-optimistic-locking` as a dependency
 * `@Import` `OptimisticLockingDecoratorConfiguration`
 
 This configures an `OptimisticLockingDecorator` `@Bean`, which is a `MessageHandlerDecorator` that retries when an `OptimisticLockingFailureException` is thrown.
 
 ==== Micronaut
 
-Not yet implemented: https://github.com/eventuate-tram/eventuate-tram-core/issues/96[Issue #46]
+add eventuate-tram-micronaut-spring-jdbc-optimistic-locking as dependency
+
+==== Quarkus
+
+add eventuate-tram-quarkus-jdbc-optimistic-locking as dependency
+
 
 === Transactional domain events
 
@@ -464,7 +509,7 @@ Note: `eventuate-tram-spring-events-publisher-starter` includes `eventuate-tram-
 
 See this example of https://github.com/eventuate-tram/eventuate-tram-core-examples-basic/blob/master/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/events/AbstractTramEventTest.java[transaction events].
 
-===== Micronaut
+===== Micronaut/Quarkus
 
 [source,java]
 ----
@@ -485,6 +530,7 @@ public abstract class AbstractTramEventTest {
 
 To publish events you need to have `TramEventsPublisherFactory` class in your classpath (see <<dependency-configuration-section, dependency configuration section>>):
 
+micronaut
 [source, groovy]
 ----
 dependencies {
@@ -492,8 +538,17 @@ dependencies {
 }
 ----
 
-
 See this example of https://github.com/eventuate-tram/eventuate-tram-core-micronaut-examples-basic/blob/master/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/events/AbstractTramEventTest.java[transaction events].
+
+quarkus
+[source, groovy]
+----
+dependencies {
+    compile "io.eventuate.tram.core:eventuate-tram-quarkus-events:$eventuateTramVersion"
+}
+----
+
+See this example of https://github.com/eventuate-tram-examples/eventuate-tram-core-quarkus-examples-basic/blob/main/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/events/AbstractTramEventTest.java[transaction events].
 
 ==== Consuming domain events
 
@@ -539,7 +594,7 @@ public class AbstractTramEventTestConfiguration {
   }
 ----
 
-See this example of https://github.com/eventuate-tram/eventuate-tram-core-examples-basic/blob/master/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/events/AbstractTramEventTest.java[transaction events].
+See this example of https://github.com/eventuate-tram/eventuate-tram-core-examples-basic/blob/master/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/events/AbstractTramEventTestConfiguration.java[transaction events].
 
 Alternative to importing `TramEventSubscriberConfiguration` is to use `eventuate-tram-spring-events-subscriber-starter`, just include it in dependency list:
 
@@ -582,6 +637,28 @@ public class AbstractTramEventTestFactory {
 
 See this example of https://github.com/eventuate-tram/eventuate-tram-core-micronaut-examples-basic/blob/master/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/events/AbstractTramEventTestFactory.java[transaction events].
 
+===== Quarkus
+
+[source,java]
+----
+
+@Singleton
+public class AbstractTramEventTestConfiguration {
+  @Singleton
+  public DomainEventDispatcher domainEventDispatcher(AbstractTramEventTestConfig config,
+                                                     TramEventTestEventConsumer target,
+                                                     DomainEventDispatcherFactory domainEventDispatcherFactory) {
+    return domainEventDispatcherFactory.make("eventDispatcherId" + config.getUniqueId(), target.domainEventHandlers());
+  }
+
+  @Singleton
+  public TramEventTestEventConsumer tramEventTestTarget(AbstractTramEventTestConfig config) {
+    return new TramEventTestEventConsumer(config.getAggregateType());
+  }
+}
+----
+
+See this example of https://github.com/eventuate-tram-examples/eventuate-tram-core-quarkus-examples-basic/blob/main/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/events/AbstractTramEventTestConfiguration.java[transaction events].
 
 === Transactional commands
 
@@ -677,6 +754,44 @@ messageConsumer.subscribe(subscriberId, "ReplyToChannel", this::handleMessage);
 
 See this example of https://github.com/eventuate-tram/eventuate-tram-core-micronaut-examples-basic/blob/master/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/commands/AbstractTramCommandTest.java[transactional commands].
 
+===== Quarkus
+
+[source,java]
+----
+public abstract class AbstractTramCommandTest {
+
+  @Inject
+  private CommandProducer commandProducer;
+
+  @Test
+  public void shouldInvokeCommand() throws InterruptedException {
+
+    String commandId = commandProducer.send("CustomerCommandChannel",
+            new DoSomethingCommand(),
+            "ReplyToChannel",
+            Collections.emptyMap());
+
+----
+
+You also need to have the `TramCommandProducerFactory` in your classpath (see <<dependency-configuration-section, dependency configuration section>>):
+
+[source, groovy]
+----
+dependencies {
+    compile "io.eventuate.tram.core:eventuate-tram-quarkus-commands:$eventuateTramVersion"
+}
+----
+
+To handle a reply message, simply subscribe to the `ReplyChannel`.
+
+[source,java]
+----
+messageConsumer.subscribe(subscriberId, "ReplyToChannel", this::handleMessage);
+----
+
+See this example of https://github.com/eventuate-tram-examples/eventuate-tram-core-quarkus-examples-basic/blob/main/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/commands/AbstractTramCommandTest.java[transactional commands].
+
+
 ==== Handling commands
 
 First, define `CommandHandlers`:
@@ -713,14 +828,15 @@ public class AbstractTramCommandTestConfiguration {
   public CommandDispatcher commandDispatcher(CommandDispatcherFactory commandDispatcherFactory,
                                              AbstractTramCommandTestConfig config,
                                              AbstractTramCommandTestCommandHandler target) {
-  return commandDispatcherFactory.make("customerServiceCommandDispatcher",
-                                       target.getCommandHandlers());
+    return commandDispatcherFactory.make("customerServiceCommandDispatcher", target.getCommandHandlers());
+  }
+
+  @Bean
+  public TramCommandTestCommandHandler abstractTramCommandTestTarget(AbstractTramCommandTestConfig config) {
+    return new TramCommandTestCommandHandler(config.getCommandChannel());
+  }
 }
 
-@Bean
-public TramCommandTestCommandHandler abstractTramCommandTestTarget(AbstractTramCommandTestConfig config) {
-  return new TramCommandTestCommandHandler(config.getCommandChannel());
-}
 ----
 
 Alternative to importing `TramCommandConsumerConfiguration` is to use `eventuate-tram-spring-commands-starter`, just include it in dependency list:
@@ -753,8 +869,30 @@ public class AbstractTramCommandTestFactory {
 }
 ----
 
-See this example of https://github.com/eventuate-tram/eventuate-tram-core-micronaut-examples-basic/blob/master/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/commands/AbstractTramCommandTest.java[transactional commands].
+See this example of https://github.com/eventuate-tram/eventuate-tram-core-micronaut-examples-basic/blob/master/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/commands/AbstractTramCommandTestFactory.java[transactional commands].
 
+===== Quarkus
+
+[source,java]
+----
+@Singleton
+public class AbstractTramCommandTestConfiguration {
+
+  @Singleton
+  public TramCommandTestCommandHandler abstractTramCommandTestTarget(AbstractTramCommandTestConfig config) {
+    return new TramCommandTestCommandHandler(config.getCommandChannel());
+  }
+
+  @Singleton
+  public CommandDispatcher commandDispatcher(CommandDispatcherFactory commandDispatcherFactory,
+                                             AbstractTramCommandTestConfig config,
+                                             TramCommandTestCommandHandler target) {
+    return commandDispatcherFactory.make(config.getCommandDispatcheId(), target.getCommandHandlers());
+  }
+}
+----
+
+See this example of https://github.com/eventuate-tram-examples/eventuate-tram-core-quarkus-examples-basic/blob/main/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/commands/AbstractTramCommandTestConfiguration.java[transactional commands].
 
 === Configuring the transport
 
@@ -803,9 +941,9 @@ dependencies {
 }
 ----
 
-===== Micronaut
+===== Micronaut/Quarkus
 
-For now, the Micronaut version of Eventuate only supports Apache Kafka as the transport mechanism.
+For now, the Micronaut and Quarkus version of Eventuate support only Apache Kafka as the transport mechanism.
 
 You don't need to create additional configuration, you only need to setup dependencies (see <<dependency-configuration-section, dependency configuration section>>):
 
@@ -835,6 +973,16 @@ datasources:
     password: mysqlpw
 ----
 
+===== Quarkus
+
+----
+quarkus.datasource.username=mysqluser
+quarkus.datasource.password=mysqlpw
+quarkus.datasource.jdbc.url=jdbc:mysql://localhost/eventuate
+quarkus.datasource.db-kind=mysql
+eventuateDatabase=mysql
+----
+
 In addition, you need to define message broker-specific properties.
 
 ===== Spring
@@ -848,7 +996,6 @@ In addition, you need to define message broker-specific properties.
 a|
 ----
 eventuatelocal.kafka.bootstrap.servers=${DOCKER_HOST_IP}:9092
-eventuatelocal.zookeeper.connection.string=${DOCKER_HOST_IP}:2181
 ----
 
 | Apache ActiveMQ
@@ -889,14 +1036,24 @@ eventuatelocal:
   kafka:
     bootstrap:
       servers: ${DOCKER_HOST_IP}:9092
-  zookeeper:
-    connection:
-      string: ${DOCKER_HOST_IP}:2181
 ----
 |===
 
+===== Quarkus
 
-See micronaut https://github.com/eventuate-tram/eventuate-tram-core-micronaut-examples-basic/blob/master/eventuate-tram-examples-jdbc-kafka/src/test/resources/application.yml[application.yml]
+[cols="25%, 75%", options="header"]
+|===
+| Message Broker
+| Properties
+
+| Apache Kafka
+a|
+----
+eventuatelocal.kafka.bootstrap.servers=${DOCKER_HOST_IP}:9092
+----
+|===
+
+See micronaut https://github.com/eventuate-tram-examples/eventuate-tram-core-quarkus-examples-basic/blob/main/eventuate-tram-examples-jdbc-kafka/src/test/resources/application.properties[application.properties]
 
 ==== In-memory transport
 
@@ -924,6 +1081,17 @@ dependencies {
 }
 ----
 
+===== Quarkus
+
+If you want to use in-memory transport include eventuate-tram-quarkus-in-memory dependency:
+
+[source, groovy]
+----
+dependencies {
+    compile "io.eventuate.tram.core:eventuate-tram-quarkus-in-memory:$eventuateTramVersion"
+}
+----
+
 === Id Generation
 
 By default, eventuate tram uses application generated message ids.
@@ -942,6 +1110,12 @@ eventuate.outbox.id=1
 eventuate:
     outbox:
         id: 1
+----
+
+===== Quarkus
+
+----
+eventuate.outbox.id=1
 ----
 
 === Running the CDC service
