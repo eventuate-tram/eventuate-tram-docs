@@ -161,6 +161,24 @@ where
 
 Note: `micronaut` only supports `kafka`
 
+=== Eventuate Bom
+
+You can use the Eventuate BOM to avoid needing to specify the artifact versions:
+
+[source, groovy]
+----
+dependencies {
+    implementation(platform("io.eventuate.platform:platform-dependencies:$eventuateBomVersion"))
+}
+----
+
+You can then specify artifacts as follows:
+
+----
+dependencies {
+  compile "io.eventuate.tram.core:eventuate-tram-spring-messaging"
+}
+----
 
 === Transactional messages
 
@@ -437,6 +455,16 @@ public class AbstractTramEventTestConfiguration {
 ...
 ----
 
+Instead of explicitly `@Import`-ing `TramEventsPublisherConfiguration` you can rely on the auto-configuration provided by `eventuate-tram-spring-events-publisher-starter`:
+
+[source, groovy]
+----
+dependencies {
+  compile "io.eventuate.tram.core:eventuate-tram-spring-events-publisher-starter:$eventuateTramVersion"
+}
+----
+
+Note: `eventuate-tram-spring-events-publisher-starter` includes `eventuate-tram-spring-messaging-starter`
 
 See this example of https://github.com/eventuate-tram/eventuate-tram-core-examples-basic/blob/master/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/events/AbstractTramEventTest.java[transaction events].
 
@@ -492,12 +520,13 @@ public class TramEventTestEventConsumer {
 }
 ----
 
-Second, configure a `DomainEventDispatcher`:
+Second, import `TramEventSubscriberConfiguration` and configure a `DomainEventDispatcher`:
 
 ===== Spring
 
 ----
 @Configuration
+@Import(TramEventSubscriberConfiguration.class)
 public class AbstractTramEventTestConfiguration {
 
   @Bean
@@ -515,6 +544,24 @@ public class AbstractTramEventTestConfiguration {
 ----
 
 See this example of https://github.com/eventuate-tram/eventuate-tram-core-examples-basic/blob/master/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/events/AbstractTramEventTest.java[transaction events].
+
+Instead of explicitly `TramEventSubscriberConfiguration`  you can use the auto-configuration provided by `eventuate-tram-spring-events-subscriber-starter`:
+
+[source, groovy]
+----
+dependencies {
+  compile "io.eventuate.tram.core:eventuate-tram-spring-events-subscriber-starter:$eventuateTramVersion"
+}
+----
+
+There is also a starter for both event publishers and subscribers:
+
+[source, groovy]
+----
+dependencies {
+  compile "io.eventuate.tram.core:eventuate-tram-spring-events-starter:$eventuateTramVersion"
+}
+----
 
 ===== Micronaut
 
@@ -576,6 +623,17 @@ You also need to `@Import` the `TramCommandProducerConfiguration` `@Configuratio
 public class AbstractTramCommandTestConfiguration {
 
 ----
+
+Alternatively, you can use the auto-configuration provided by `eventuate-tram-spring-commands-starter`:
+
+[source, groovy]
+----
+dependencies {
+  compile "io.eventuate.tram.core:eventuate-tram-spring-commands-starter:$eventuateTramVersion"
+}
+----
+
+Note: `eventuate-tram-spring-commands-starter` includes `eventuate-tram-spring-messaging-starter`
 
 To handle a reply message, simply subscribe to the `ReplyChannel`.
 
@@ -645,13 +703,14 @@ public class TramCommandTestCommandHandler {
   }
 ----
 
-Second, define a `CommandDispatcher`:
+Second, import `TramCommandConsumerConfiguration` and define a `CommandDispatcher`:
 
 ===== Spring
 
 [source,java]
 ----
 @Configuration
+@Import(TramCommandConsumerConfiguration.class)
 public class AbstractTramCommandTestConfiguration {
 
   @Bean
@@ -665,6 +724,15 @@ public class AbstractTramCommandTestConfiguration {
 @Bean
 public TramCommandTestCommandHandler abstractTramCommandTestTarget(AbstractTramCommandTestConfig config) {
   return new TramCommandTestCommandHandler(config.getCommandChannel());
+}
+----
+
+Instead of explicitly `@Import`-ing `TramCommandConsumerConfiguration`  you can use the auto-configuration provided by `eventuate-tram-spring-commands-starter`:
+
+[source, groovy]
+----
+dependencies {
+  compile "io.eventuate.tram.core:eventuate-tram-spring-commands-starter:$eventuateTramVersion"
 }
 ----
 
@@ -729,6 +797,15 @@ To consumer a consumer, `@Import` one of the `EventuateTram<MessageBroker>Messag
 * `EventuateTramRedisMessageConsumerConfiguration`
 
 For example, see the FTGO application's https://github.com/microservices-patterns/ftgo-application/blob/master/ftgo-order-history-service/src/main/java/net/chrisrichardson/ftgo/cqrs/orderhistory/main/OrderHistoryServiceMain.java[`Order History Service`], which is a consumer-only service.
+
+Instead of explicitly `@Import`-ing a transport-specific configuration class, you can instead using the auto-configuration provided by  `eventuate-tram-spring-messaging-starter`:
+
+[source, groovy]
+----
+dependencies {
+  compile "io.eventuate.tram.core:eventuate-tram-spring-messaging-starter:$eventuateTramVersion"
+}
+----
 
 ===== Micronaut
 

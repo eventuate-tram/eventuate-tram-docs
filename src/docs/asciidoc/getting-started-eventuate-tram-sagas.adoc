@@ -147,6 +147,25 @@ where
 
 Note: `micronaut` only supports `kafka`
 
+=== Eventuate Bom
+
+You can use the Eventuate BOM to avoid needing to specify the artifact versions:
+
+[source, groovy]
+----
+dependencies {
+    implementation(platform("io.eventuate.platform:platform-dependencies:$eventuateBomVersion"))
+}
+----
+
+You can then specify artifacts as follows:
+
+----
+dependencies {
+  compile "io.eventuate.tram.sagas:eventuate-tram-sagas-micronaut-participant"
+}
+----
+
 ==== Writing an orchestrator
 
 The https://github.com/eventuate-tram/eventuate-tram-sagas-examples-customers-and-orders[Customers and Orders (Spring)] uses a saga to create an `Order` in the `Order Service` and reserve credit in the `Customer Service`.
@@ -213,6 +232,15 @@ EventuateTramKafkaMessageConsumerConfiguration.class
 })
 public class OrderConfiguration {
 ...
+----
+
+Instead of explicitly `@Import`-ing configuration classes you can rely on the auto-configuration provided by `eventuate-tram-sagas-spring-orchestration-simple-dsl-starter`:
+
+[source, groovy]
+----
+dependencies {
+  compile "io.eventuate.tram.sagas:eventuate-tram-sagas-spring-orchestration-simple-dsl-starter:$eventuateTramSagasVersion"
+}
 ----
 
 ====== Micronaut
@@ -340,6 +368,17 @@ public class CustomerCommandHandler {
 @EnableAutoConfiguration
 public class CustomerConfiguration {
   ....
+----
+
+instead of explicit configuration importing is possible to use starters, just include them in dependency list:
+
+Instead of explicitly `@Import`-ing `SagaParticipantConfiguration` you can rely on the auto-configuration provided by `eventuate-tram-sagas-spring-participant-starter`:
+
+[source, groovy]
+----
+dependencies {
+  compile "io.eventuate.tram.sagas:eventuate-tram-sagas-spring-participant-starter:$eventuateTramSagasVersion"
+}
 ----
 
 ===== Micronaut
