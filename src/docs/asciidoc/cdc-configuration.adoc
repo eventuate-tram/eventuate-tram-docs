@@ -610,9 +610,9 @@ To publish messages to RabbitMQ, please enable the `RabbitMQ` Spring profile usi
 | Description
 | Default Value
 
-| rabbitmq.url
-| Host of the RabbitMQ server.
-Example: 172.17.0.1
+| rabbitmq.broker.addresses
+| Coma separated hosts with optional ports of the RabbitMQ servers.
+Example: 172.17.0.1,172.17.0.1:6000
 | -
 
 | eventuate.rabbitmq.partition.count

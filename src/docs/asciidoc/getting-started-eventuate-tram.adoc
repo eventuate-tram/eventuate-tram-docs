@@ -586,6 +586,7 @@ public class AbstractTramEventTestFactory {
 
 See this example of https://github.com/eventuate-tram/eventuate-tram-core-micronaut-examples-basic/blob/master/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/events/AbstractTramEventTestFactory.java[transaction events].
 
+Please note: because of how Micronaut behaves, if you want to define several dispatchers, you must used the https://docs.oracle.com/javaee/6/api/javax/inject/Named.html[@Named annotation] on the `DomainEventDispatcher` bean definitions.
 
 === Transactional commands
 
@@ -865,7 +866,7 @@ activemq.url=...
 | RabbitMQ
 a|
 ----
-rabbitmq.url=...
+rabbitmq.broker.addresses=...
 eventuate.rabbitmq.partition.count=...
 ----
 
