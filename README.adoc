@@ -9,3 +9,5 @@ It implements the https://microservices.io/patterns/data/saga.html[Saga pattern]
 Eventuate Tram enables a services to send and receive messages as part of an database transaction.
 It does this by implementing the https://microservices.io/patterns/data/application-events.html[Transactional outbox pattern].
 This pattern is foundation of maintaining data consistency within a microservice architecture.
+
+You can build the HTML documentation by running `./gradlew asciidoctor`.

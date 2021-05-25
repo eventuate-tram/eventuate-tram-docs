@@ -32,10 +32,7 @@ And, the following message brokers:
 
 Latest library versions:
 
-|===
-| Release a| image::https://api.bintray.com/packages/eventuateio-oss/eventuate-maven-release/eventuate-tram/images/download.svg[link="https://bintray.com/eventuateio-oss/eventuate-maven-release/eventuate-tram/_latestVersion"]
-| RC a| image::https://api.bintray.com/packages/eventuateio-oss/eventuate-maven-rc/eventuate-tram/images/download.svg[link="https://bintray.com/eventuateio-oss/eventuate-maven-rc/eventuate-tram/_latestVersion"]
-|===
+image::https://img.shields.io/maven-central/v/io.eventuate.tram.core/eventuate-tram-bom[link="https://search.maven.org/artifact/io.eventuate.tram.core/eventuate-tram-bom"]
 
 
 ==== Gradle
@@ -54,7 +51,6 @@ In `build.gradle`, specify these Maven repositories:
 ----
 repositories {
     mavenCentral()
-    jcenter()
 }
 ----
 

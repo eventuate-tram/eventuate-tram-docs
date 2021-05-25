@@ -45,10 +45,7 @@ There are four parts to using Eventuate Tram Saga to implement an orchestration-
 
 The latest versions are:
 
-|===
-| Release a| image::https://api.bintray.com/packages/eventuateio-oss/eventuate-maven-release/eventuate-tram-sagas/images/download.svg[link="https://bintray.com/eventuateio-oss/eventuate-maven-release/eventuate-tram-sagas/_latestVersion"][link="https://bintray.com/eventuateio-oss/eventuate-maven-release/eventuate-tram-sagas/_latestVersion"]
-| RC a| image::https://api.bintray.com/packages/eventuateio-oss/eventuate-maven-rc/eventuate-tram-sagas/images/download.svg[link="https://bintray.com/eventuateio-oss/eventuate-maven-rc/eventuate-tram-sagas/_latestVersion"][link="https://bintray.com/eventuateio-oss/eventuate-maven-rc/eventuate-tram-sagas/_latestVersion"]
-|===
+image::https://img.shields.io/maven-central/v/io.eventuate.tram.sagas/eventuate-tram-sagas-bom[link="https://search.maven.org/search?q=io.eventuate.tram.sagas"]
 
 
 In `gradle.properties`:
@@ -63,7 +60,6 @@ In `build.gradle`, specify these Maven repositories:
 ----
 repositories {
     mavenCentral()
-    jcenter()
 }
 ----
 

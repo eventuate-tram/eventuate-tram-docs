@@ -49,7 +49,7 @@ Eventuate CDC supports the following message brokers
 The Eventuate CDC service is conveniently packaged as a Docker image.
 The latest version is
 
-image::https://api.bintray.com/packages/eventuateio-oss/eventuate-maven-release/eventuate-cdc/images/download.svg[link="https://bintray.com/eventuateio-oss/eventuate-maven-release/eventuate-cdc/_latestVersion"]
+image::https://img.shields.io/maven-central/v/io.eventuate.cdc/eventuate-cdc-service[link="https://search.maven.org/artifact/io.eventuate.cdc/eventuate-cdc-service"]
 
 [cols=2, options="header"]
 |===
