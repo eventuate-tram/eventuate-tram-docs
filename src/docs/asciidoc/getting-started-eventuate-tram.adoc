@@ -157,14 +157,16 @@ where
 
 Note: `micronaut` only supports `kafka`
 
-=== Eventuate Bom
+=== Eventuate BOM
+
+image::https://img.shields.io/maven-central/v/io.eventuate.platform/eventuate-platform-dependencies[link="https://search.maven.org/search?q=a:eventuate-platform-dependencies"]
 
 You can use the Eventuate BOM to avoid needing to specify the artifact versions:
 
 [source, groovy]
 ----
 dependencies {
-    implementation(platform("io.eventuate.platform:platform-dependencies:$eventuateBomVersion"))
+    implementation(platform("io.eventuate.platform:eventuate-platform-dependencies:$eventuateBomVersion"))
 }
 ----
 
