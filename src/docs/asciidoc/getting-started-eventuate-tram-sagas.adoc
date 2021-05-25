@@ -370,8 +370,6 @@ public class CustomerConfiguration {
   ....
 ----
 
-instead of explicit configuration importing is possible to use starters, just include them in dependency list:
-
 Instead of explicitly `@Import`-ing `SagaParticipantConfiguration` you can rely on the auto-configuration provided by `eventuate-tram-sagas-spring-participant-starter`:
 
 [source, groovy]

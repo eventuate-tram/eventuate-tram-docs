@@ -840,7 +840,6 @@ datasources:
     password: mysqlpw
 ----
 
-
 In addition, you need to define message broker-specific properties.
 
 ===== Spring
@@ -930,6 +929,26 @@ dependencies {
 }
 ----
 
+=== Id Generation
+
+By default, eventuate tram uses application generated message ids.
+In case if you want to use database generated id (recommended), specify outbox id the same that used for eventuate cdc reader.
+For more information, please see link:./cdc-configuration.html[CDC Documentation].
+
+===== Spring
+
+----
+eventuate.outbox.id=1
+----
+
+===== Micronaut
+
+----
+eventuate:
+    outbox:
+        id: 1
+----
+
 === Running the CDC service
 
 In addition to a database and message broker, you will need to run the link:./cdc-configuration.html[Eventuate Tram CDC] service.
@@ -962,6 +981,7 @@ cdcservice:
     EVENTUATELOCAL_CDC_OFFSET_STORE_KEY: MySqlBinlog
     EVENTUATELOCAL_CDC_MYSQL_BINLOG_CLIENT_UNIQUE_ID: 1234567890
     EVENTUATELOCAL_CDC_READ_OLD_DEBEZIUM_DB_OFFSET_STORAGE_TOPIC: "false"
+    EVENTUATE_OUTBOX_ID: 1
 ----
 
 For more information, please see link:./cdc-configuration.html[Eventuate Tram CDC]
