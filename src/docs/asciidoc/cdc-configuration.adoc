@@ -153,7 +153,9 @@ Publishing:
 
 There are two sets of properties, one for the reader and another for the pipeline.
 
-==== ID generation (THIS NEEDS TO MOVE SOMEWHERE ELSE)
+==== ID generation
+
+//  TODO THIS NEEDS TO MOVE SOMEWHERE ELSE
 
 Each event/message has a 128-bit ID.
 Eventuate event/message IDs must be

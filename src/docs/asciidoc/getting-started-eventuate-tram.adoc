@@ -875,7 +875,7 @@ See this example of https://github.com/eventuate-tram-examples/eventuate-tram-co
 
 === Configuring the transport
 
-===== Spring
+==== Spring
 
 You also need to configure the transport mechanism, specifically the message broker.
 You do this importing one of the `TramJdbc<MessageBroker>Configuration` classes:
@@ -920,7 +920,7 @@ dependencies {
 }
 ----
 
-===== Micronaut/Quarkus
+==== Micronaut/Quarkus
 
 For now, the Micronaut and Quarkus version of Eventuate support only Apache Kafka as the transport mechanism.
 
@@ -932,7 +932,7 @@ There are various configuration properties that need to be set for each transpor
 
 Since JDBC is used, you must set the usual properties, such as:
 
-===== Spring
+==== Spring
 
 ----
 spring.datasource.url=jdbc:mysql://${DOCKER_HOST_IP}/eventuate
@@ -941,7 +941,7 @@ spring.datasource.password=mysqlpw
 spring.datasource.driver.class.name=com.mysql.jdbc.driver
 ----
 
-===== Micronaut
+==== Micronaut
 
 ----
 datasources:
@@ -952,7 +952,7 @@ datasources:
     password: mysqlpw
 ----
 
-===== Quarkus
+==== Quarkus
 
 ----
 quarkus.datasource.username=mysqluser
@@ -964,7 +964,7 @@ eventuateDatabase=mysql
 
 In addition, you need to define message broker-specific properties.
 
-===== Spring
+==== Spring
 
 [cols="25%, 75%", options="header"]
 |===
@@ -1002,7 +1002,7 @@ eventuate.redis.partitions=...
 
 See spring https://github.com/eventuate-tram/eventuate-tram-core-examples-basic/blob/master/eventuate-tram-examples-jdbc-kafka/src/test/resources/application.properties[application.properties]
 
-===== Micronaut
+==== Micronaut
 
 [cols="25%, 75%", options="header"]
 |===
@@ -1023,7 +1023,7 @@ eventuatelocal:
 |===
 
 
-===== Quarkus
+==== Quarkus
 
 See micronaut https://github.com/eventuate-tram/eventuate-tram-core-micronaut-examples-basic/blob/master/eventuate-tram-examples-jdbc-kafka/src/test/resources/application.yml[application.yml]
 [cols="25%, 75%", options="header"]
@@ -1078,19 +1078,19 @@ dependencies {
 }
 ----
 
-=== Id Generation
+=== ID Generation
 
-By default, eventuate tram uses application generated message ids.
-In case if you want to use database generated id (recommended), specify outbox id the same that used for eventuate cdc reader.
-For more information, please see link:./cdc-configuration.html[CDC Documentation].
+By default, eventuate tram uses application-generated message IDs.
+If you want to use database-generated IDs (recommended), specify the outbox id you used for the Eventuate CDC reader.
+For more information, please see link:./cdc-configuration.html#_id_generation[CDC Documentation].
 
-===== Spring
+==== Spring
 
 ----
 eventuate.outbox.id=1
 ----
 
-===== Micronaut
+==== Micronaut
 
 ----
 eventuate:
