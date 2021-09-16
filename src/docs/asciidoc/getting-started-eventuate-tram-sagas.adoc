@@ -43,24 +43,30 @@ There are four parts to using Eventuate Tram Saga to implement an orchestration-
 
 ==== Maven/Gradle artifacts
 
-The artifacts are in https://bintray.com/eventuateio-oss/eventuate-maven-rc/eventuate-tram-sagas[Eventuate Maven Release Candidate Repository].
 The latest version is:
 
-image::https://api.bintray.com/packages/eventuateio-oss/eventuate-maven-rc/eventuate-tram-sagas/images/download.svg[link="https://bintray.com/eventuateio-oss/eventuate-maven-rc/eventuate-tram-sagas/_latestVersion"][link="https://bintray.com/eventuateio-oss/eventuate-maven-release/eventuate-tram-sagas/_latestVersion"]
+[cols="a,a"]
+|===
+| Spring/Micronaut
+| image::https://img.shields.io/maven-central/v/io.eventuate.tram.sagas/eventuate-tram-sagas-bom[link="https://search.maven.org/search?q=io.eventuate.tram.sagas"]
+| Quarkus
+| image::https://img.shields.io/maven-central/v/io.eventuate.tram.sagas/eventuate-tram-sagas-quarkus-bom[link="https://search.maven.org/search?q=io.eventuate.tram.sagas"]
+|===
+
 
 In `gradle.properties`:
 
 ----
 eventuateTramSagasVersion=LATEST_VERSION
+eventuateTramSagasQuarkusVersion=LATEST_VERSION
 ----
 
-In `build.gradle`, specify these maven repositories:
+In `build.gradle`, specify these Maven repositories:
 
 [source, groovy]
 ----
 repositories {
     mavenCentral()
-    jcenter()
 }
 ----
 
@@ -90,6 +96,15 @@ dependency {
 }
 ----
 
+Quarkus:
+
+[source, groovy]
+----
+dependency {
+  compile "io.eventuate.tram.sagas:eventuate-tram-sagas-quarkus-orchestration-simple-dsl:$eventuateTramSagasQuarkusVersion"
+}
+----
+
 ===== Saga participant dependencies
 
 If you are writing a saga participant then add this dependency:
@@ -116,9 +131,18 @@ dependency {
 }
 ----
 
+Quarkus:
+
+[source, groovy]
+----
+dependency {
+  compile "io.eventuate.tram.sagas:eventuate-tram-sagas-quarkus-participant:$eventuateTramSagasQuarkusVersion"
+}
+----
+
 ===== Eventuate Tram dependencies
 
-You must also include one of the https://github.com/eventuate-tram/eventuate-tram-core[Eventuate Tram] 'implementation' artifacts:
+You must also include one of the https://github.com/eventuate-tram/eventuate-tram-core[Eventuate Tram] or https://github.com/eventuate-tram/eventuate-tram-core-quarkus[Eventuate Tram Quarkus] 'implementation' artifacts:
 
 [source, groovy]
 ----
@@ -139,10 +163,31 @@ dependencies {
 
 where
 
-* `framework` is `spring` or `micronaut`
+* `framework` is `spring`, `micronaut` or `quarkus`
 * `message-broker` is `kafka`, `apachemq`, `rabbitmq` or `redis`.
 
-Note: `micronaut` only supports `kafka`
+Note: `micronaut` and `quarkus` only support `kafka`
+
+=== Eventuate BOM
+
+image::https://img.shields.io/maven-central/v/io.eventuate.platform/eventuate-platform-dependencies[link="https://search.maven.org/search?q=a:eventuate-platform-dependencies"]
+
+You can use the Eventuate BOM to avoid needing to specify the artifact versions:
+
+[source, groovy]
+----
+dependencies {
+    implementation(platform("io.eventuate.platform:eventuate-platform-dependencies:$eventuateBomVersion"))
+}
+----
+
+You can then specify artifacts as follows:
+
+----
+dependencies {
+  compile "io.eventuate.tram.sagas:eventuate-tram-sagas-micronaut-participant"
+}
+----
 
 ==== Writing an orchestrator
 
@@ -156,7 +201,11 @@ If the reservation is success, the next step is executed.
 Otherwise, the compensating transactions are executed to roll back the saga.
 3. Approves the order, if the credit is reserved.
 
-https://github.com/eventuate-tram-examples/eventuate-tram-sagas-micronaut-examples-customers-and-orders[Micronaut version of Customers and Orders]
+Here are the versions for Micronaut and Quarkus:
+
+* https://github.com/eventuate-tram-examples/eventuate-tram-sagas-micronaut-examples-customers-and-orders[Micronaut version of Customers and Orders]
+* https://github.com/eventuate-examples/eventuate-tram-sagas-quarkus-examples-customers-and-orders[Quarkus version of Customers and Orders]
+
 
 ===== Writing the saga orchestrator class
 
@@ -212,12 +261,42 @@ public class OrderConfiguration {
 ...
 ----
 
+Instead of explicitly `@Import`-ing configuration classes you can rely on the auto-configuration provided by `eventuate-tram-sagas-spring-orchestration-simple-dsl-starter`:
+
+[source, groovy]
+----
+dependencies {
+  compile "io.eventuate.tram.sagas:eventuate-tram-sagas-spring-orchestration-simple-dsl-starter:$eventuateTramSagasVersion"
+}
+----
+
 ====== Micronaut
 
-TBD
+Just add following dependencies
 
+[source, groovy]
+----
+dependencies {
+  compile "io.eventuate.tram.sagas:eventuate-tram-sagas-micronaut-orchestration:$eventuateTramSagasVersion"
+  compile "io.eventuate.tram.core:eventuate-tram-micronaut-producer-jdbc:$eventuateTramVersion"
+  compile "io.eventuate.tram.core:eventuate-tram-micronaut-consumer-kafka:$eventuateTramVersion"
+}
+----
 
-===== Creating an saga orchestrator
+====== Quarkus
+
+Just add following dependencies
+
+[source, groovy]
+----
+dependencies {
+  compile "io.eventuate.tram.sagas:eventuate-tram-sagas-quarkus-orchestration:$eventuateTramSagasVersion"
+  compile "io.eventuate.tram.core:eventuate-tram-quarkus-producer-jdbc:$eventuateTramVersion"
+  compile "io.eventuate.tram.core:eventuate-tram-quarkus-consumer-kafka:$eventuateTramVersion"
+}
+----
+
+===== Creating a saga orchestrator
 
 The `OrderService` creates the saga using `SagaInstanceFactory`:
 
@@ -248,7 +327,7 @@ public class OrderService {
 }
 ----
 
-====== Micronaut
+====== Micronaut/Quarkus
 
 [source, java]
 ----
@@ -296,7 +375,7 @@ public class CustomerCommandHandler {
   ...
 ----
 
-===== Micronaut
+===== Micronaut/Quarkus
 
 [source, java]
 ----
@@ -337,6 +416,15 @@ public class CustomerCommandHandler {
 @EnableAutoConfiguration
 public class CustomerConfiguration {
   ....
+----
+
+Instead of explicitly `@Import`-ing `SagaParticipantConfiguration` you can rely on the auto-configuration provided by `eventuate-tram-sagas-spring-participant-starter`:
+
+[source, groovy]
+----
+dependencies {
+  compile "io.eventuate.tram.sagas:eventuate-tram-sagas-spring-participant-starter:$eventuateTramSagasVersion"
+}
 ----
 
 ===== Micronaut

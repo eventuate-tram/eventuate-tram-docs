@@ -1,5 +1,5 @@
 = Eventuate Tram documentation
-Copyright (c) 2020 Chris Richardson Consulting Inc. All rights reserved
+Copyright (c) 2021 Chris Richardson Consulting Inc. All rights reserved
 
 The reference documentation consists of the following sections:
 
@@ -8,5 +8,6 @@ The reference documentation consists of the following sections:
 <<distributed-data-management.html#distributed-data-management, Distributed data management in a microservice architecture>> :: Why Eventuate Tram?
 <<about-eventuate-tram.html#about-eventuate-tram,Overview of Eventuate Tram>> :: Overview of Eventuate Tram
 <<getting-started-eventuate-tram.html#getting-started,Getting started with Eventuate Tram>> :: Getting started with Eventuate Tram
+<<getting-started-eventuate-tram-dotnet.html#getting-started,Getting started with Eventuate Tram .NET>> :: Getting started with Eventuate Tram .NET
 <<getting-started-eventuate-tram-sagas.html#getting-started-tram-sagas,Getting started with Eventuate Tram Sagas>> :: Getting started with Eventuate Tram Saga ochestration
 <<cdc-configuration.html#cdc-configuration,CDC configuration>> :: Configuring the CDC service
