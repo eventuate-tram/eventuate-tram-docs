@@ -595,6 +595,87 @@ The Eventuate Tram CDC supports `eventuate-tram` and `eventuate-local`
 
 |===
 
+==== Configuring a cleaner
+
+Cdc can automatically remove old messages from message table and received_message table.
+Example configuration:
+
+----
+EVENTUATE_CDC_CLEANER_C1_PIPELINE: P4
+EVENTUATE_CDC_CLEANER_C1_MESSAGE_CLEANING_ENABLED: "true"
+EVENTUATE_CDC_CLEANER_C1_MESSAGES_MAX_AGE_IN_SECONDS: 1
+EVENTUATE_CDC_CLEANER_C1_INTERVAL_IN_SECONDS: 1
+...
+----
+
+If pipeline is specified, pipeline database configuration is used.
+If not, please specify parameters explicitly:
+
+----
+EVENTUATE_CDC_CLEANER_C3_DATASOURCE_URL: jdbc:postgresql://postgreswalpipeline/eventuate
+EVENTUATE_CDC_CLEANER_C3_DATASOURCE_USERNAME: eventuate
+EVENTUATE_CDC_CLEANER_C3_DATASOURCE_PASSWORD: eventuate
+EVENTUATE_CDC_CLEANER_C3_DATASOURCE_DRIVER_CLASSNAME: org.postgresql.Driver
+EVENTUATE_CDC_CLEANER_C3_MESSAGE_CLEANING_ENABLED: "true"
+EVENTUATE_CDC_CLEANER_C3_MESSAGES_MAX_AGE_IN_SECONDS: 1
+EVENTUATE_CDC_CLEANER_C3_INTERVAL_IN_SECONDS: 1
+...
+----
+
+Full list of configuration properties
+
+[cols=3, options="header"]
+|===
+| Name
+| Description
+| Default Value
+
+| dataSourceUrl
+| jdbc connection url
+| -
+
+| dataSourceUserName
+| jdbc username
+| -
+
+| dataSourcePassword
+| jdbc password
+| -
+
+| dataSourceDriverClassName
+| jdbc driver class name
+| -
+
+| eventuateSchema
+| database schema
+| depends on RDBMS
+
+| pipeline
+| pipeline name (used instead of jdbc configuration)
+| -
+
+| messageCleaningEnabled
+| enables message table cleaning
+| false
+
+| messagesMaxAgeInSeconds
+| max age of message to remove
+| 2 days
+
+| receivedMessageCleaningEnabled
+| enables received_message table cleaning
+| false
+
+| receivedMessagesMaxAgeInSeconds
+| max age of received_message to remove
+| 2 days
+
+| intervalInSeconds
+| how often cdc starts cleaning
+| every minute
+
+|===
+
 === Configuring the publisher
 
 The publisher is invoked by the pipeline to publish a message/event to the message broker.
