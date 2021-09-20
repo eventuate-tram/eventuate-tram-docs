@@ -612,7 +612,7 @@ EVENTUATE_CDC_CLEANER_CLEANER1_INTERVAL_IN_SECONDS: 1
 ...
 ----
 
-Here is specified message cleaner with name CLEANER1.
+Here is specified message cleaner with name CLEANER1 (EVENTUATE_CDC_CLEANER is root property name).
 It used database connection from PIPELINE1.
 Cleaning enabled for message and received_message table.
 Max message and received message age is one second.
