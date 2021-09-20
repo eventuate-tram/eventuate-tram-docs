@@ -598,27 +598,35 @@ The Eventuate Tram CDC supports `eventuate-tram` and `eventuate-local`
 ==== Configuring a cleaner
 
 Cdc can automatically remove old messages from message table and received_message table.
+To enable cleaning is necessary to define one or more named cleaners.
+A cleaner can clean message and/or received_message tables.
 Example configuration:
 
 ----
-EVENTUATE_CDC_CLEANER_C1_PIPELINE: P4
-EVENTUATE_CDC_CLEANER_C1_MESSAGE_CLEANING_ENABLED: "true"
-EVENTUATE_CDC_CLEANER_C1_MESSAGES_MAX_AGE_IN_SECONDS: 1
-EVENTUATE_CDC_CLEANER_C1_INTERVAL_IN_SECONDS: 1
+EVENTUATE_CDC_CLEANER_CLEANER1_PIPELINE: PIPELINE1
+EVENTUATE_CDC_CLEANER_CLEANER1_MESSAGE_CLEANING_ENABLED: "true"
+EVENTUATE_CDC_CLEANER_CLEANER1_MESSAGES_MAX_AGE_IN_SECONDS: 1
+EVENTUATE_CDC_CLEANER_CLEANER1_RECEIVED_MESSAGE_CLEANING_ENABLED: "true"
+EVENTUATE_CDC_CLEANER_CLEANER1_RECEIVED_MESSAGES_MAX_AGE_IN_SECONDS: 1
+EVENTUATE_CDC_CLEANER_CLEANER1_INTERVAL_IN_SECONDS: 1
 ...
 ----
 
+Here is specified message cleaner with name CLEANER1.
+It used database connection from PIPELINE1.
+Cleaning enabled for message and received_message table.
+Max message and received message age is one second.
+Cleaning will be started on each second.
+
+
 If pipeline is specified, pipeline database configuration is used.
-If not, please specify parameters explicitly:
+If not, please specify additional database parameters explicitly:
 
 ----
-EVENTUATE_CDC_CLEANER_C3_DATASOURCE_URL: jdbc:postgresql://postgreswalpipeline/eventuate
-EVENTUATE_CDC_CLEANER_C3_DATASOURCE_USERNAME: eventuate
-EVENTUATE_CDC_CLEANER_C3_DATASOURCE_PASSWORD: eventuate
-EVENTUATE_CDC_CLEANER_C3_DATASOURCE_DRIVER_CLASSNAME: org.postgresql.Driver
-EVENTUATE_CDC_CLEANER_C3_MESSAGE_CLEANING_ENABLED: "true"
-EVENTUATE_CDC_CLEANER_C3_MESSAGES_MAX_AGE_IN_SECONDS: 1
-EVENTUATE_CDC_CLEANER_C3_INTERVAL_IN_SECONDS: 1
+EVENTUATE_CDC_CLEANER_CLEANER1_DATASOURCE_URL: jdbc:postgresql://postgreswalpipeline/eventuate
+EVENTUATE_CDC_CLEANER_CLEANER1_DATASOURCE_USERNAME: eventuate
+EVENTUATE_CDC_CLEANER_CLEANER1_DATASOURCE_PASSWORD: eventuate
+EVENTUATE_CDC_CLEANER_CLEANER1_DATASOURCE_DRIVER_CLASSNAME: org.postgresql.Driver
 ...
 ----
 
