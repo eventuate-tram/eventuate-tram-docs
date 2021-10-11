@@ -396,7 +396,7 @@ If polling fails, reader will try again using the specified interval.
 | Pipeline property name
 
 | eventuate.database.schema
-| Schema which is listened by the CDC service
+| Schema which is listened by the CDC service (use `NONE` for default from jdbc connection)
 | eventuate
 | eventuateDatabaseSchema
 
@@ -580,7 +580,7 @@ The Eventuate Tram CDC supports `eventuate-tram` and `eventuate-local`
 | -
 
 | eventuateDatabaseSchema
-| The schema of the transaction outbox table
+| The schema of the transaction outbox table (use `NONE` for default from jdbc connection).
 | `eventuate`
 
 | sourceTableName
@@ -895,6 +895,11 @@ The CDC service requires various infrastructure services including:
 
 The Eventuate CDC service requires several tables.
 The Eventuate MySQL and Postgres images define these tables.
+
+
+In default eventuate images, tables are located in 'eventuate' schema.
+If you created necessary tables (see further) in some custom schema, please specify it in `eventuate.database.schema` property or use value `NONE` for it.
+See  <<Single pipeline - Pipeline Properties>> and <<Configuring a pipeline>>
 
 ==== Mysql schema example for eventuate local
 
