@@ -897,11 +897,11 @@ The Eventuate CDC service requires several tables.
 The Eventuate MySQL and Postgres images define these tables.
 
 
-In default eventuate images, tables are located in 'eventuate' schema.
+In the default Eventuate images, tables are located in 'eventuate' schema.
 If you created necessary tables (see further) in some custom schema, please specify it in `eventuate.database.schema` property or use value `NONE` for it.
 See  <<Single pipeline - Pipeline Properties>> and <<Configuring a pipeline>>
 
-==== Mysql schema example for eventuate local
+==== MySQL schema example for Eventuate Local
 
 ----
 create table events (
@@ -934,7 +934,21 @@ create table snapshots (
 );
 ----
 
-==== Mysql schema example for eventuate tram
+For details see:
+
+link:https://github.com/eventuate-foundation/eventuate-common/blob/master/mysql/1.initialize-database.sql[MySQL schema for Eventuate Local]
+
+link:https://github.com/eventuate-foundation/eventuate-common/blob/master/mysql/4.initialize-database-db-id.sql[MySQL schema for Eventuate Local with database generated id]
+
+link:https://github.com/eventuate-foundation/eventuate-common/tree/master/postgres/1.initialize-database.sql[Postgres schema for Eventuate Local]
+
+link:https://github.com/eventuate-foundation/eventuate-common/tree/master/postgres/5.initialize-database-db-id.sql[Postgres schema for Eventuate Local with database generated id]
+
+link:https://github.com/eventuate-foundation/eventuate-common/tree/master/mssql/1.setup.sql[MSSQL schema for Eventuate Local]
+
+link:https://github.com/eventuate-foundation/eventuate-common/tree/master/mssql/4.setup-db-id.sql[MSSQL schema for Eventuate Local with database generated id]
+
+==== MySQL schema example for Eventuate Tram
 
 ----
 CREATE TABLE message (
@@ -956,7 +970,21 @@ CREATE TABLE received_messages (
 );
 ----
 
-==== Mysql schema example for eventuate tram sagas
+For details see:
+
+link:https://github.com/eventuate-foundation/eventuate-common/blob/master/mysql/2.initialize-database.sql[MySQL schema for Eventuate Tram]
+
+link:https://github.com/eventuate-foundation/eventuate-common/blob/master/mysql/4.initialize-database-db-id.sql[MySQL schema for Eventuate Tram with database generated id]
+
+link:https://github.com/eventuate-foundation/eventuate-common/tree/master/postgres/2.initialize-database.sql[Postgres schema for Eventuate Tram]
+
+link:https://github.com/eventuate-foundation/eventuate-common/tree/master/postgres/5.initialize-database-db-id.sql[Postgres schema for Eventuate Tram with database generated id]
+
+link:https://github.com/eventuate-foundation/eventuate-common/tree/master/mssql/2.setup.sql[MSSQL schema for Eventuate Tram]
+
+link:https://github.com/eventuate-foundation/eventuate-common/tree/master/mssql/4.setup-db-id.sql[MSSQL schema for Eventuate Tram with database generated id]
+
+==== MySQL schema example for Eventuate Tram Saga
 
 ----
 CREATE TABLE saga_instance_participants (
@@ -995,6 +1023,14 @@ create table saga_stash_table(
 );
 ----
 
+For details see:
+
+link:https://github.com/eventuate-tram/eventuate-tram-sagas/tree/master/mysql/tram-saga-schema.sql[MySQL schema for Eventuate Tram Saga]
+
+link:https://github.com/eventuate-tram/eventuate-tram-sagas/tree/master/postgres/tram-saga-schema.sql[Postgres schema for Eventuate Tram Saga]
+
+link:https://github.com/eventuate-tram/eventuate-tram-sagas/tree/master/mssql/5.tram-saga-schema.sql[MSSQL schema for Eventuate tram Saga]
+
 ==== `CDC_MONITORING` table
 
 The CDC service uses the `CDC_MONITORING` table to implement a 'heart beat' mechanism.
@@ -1007,33 +1043,30 @@ create table cdc_monitoring (
 );
 ----
 
+For details see:
+
+link:https://github.com/eventuate-foundation/eventuate-common/blob/master/mysql/1.initialize-database.sql[MySQL schema for monitoring]
+
+link:https://github.com/eventuate-foundation/eventuate-common/tree/master/postgres/1.initialize-database.sql[Postgres schema for monitoring]
+
+link:https://github.com/eventuate-foundation/eventuate-common/tree/master/mssql/1.setup.sql[MSSQL schema for monitoring]
+
 ==== `OFFSET_STORE` table
 
 When publishing messages to Apache ActiveMQ, RabbitMQ, Redis, the MySql binlog reader records the current binlog position in this table.
 
 ----
-CREATE TABLE eventuate.offset_store(
+CREATE TABLE offset_store(
   client_name VARCHAR(255) NOT NULL PRIMARY KEY,
   serialized_offset LONGTEXT
 );
 ----
 
-==== Full Database Schema
+link:https://github.com/eventuate-foundation/eventuate-common/blob/master/mysql/2.initialize-database.sql[MySQL schema for offset storage]
 
-For full schema info, please see:
+link:https://github.com/eventuate-foundation/eventuate-common/tree/master/postgres/2.initialize-database.sql[Postgres schema offset storage]
 
-https://github.com/eventuate-foundation/eventuate-common/tree/master/mysql
-
-https://github.com/eventuate-foundation/eventuate-common/tree/master/postgres
-
-https://github.com/eventuate-foundation/eventuate-common/tree/master/mssql
-
-
-https://github.com/eventuate-tram/eventuate-tram-sagas/tree/master/mysql
-
-https://github.com/eventuate-tram/eventuate-tram-sagas/tree/master/postgres
-
-https://github.com/eventuate-tram/eventuate-tram-sagas/tree/master/mssql
+link:https://github.com/eventuate-foundation/eventuate-common/tree/master/mssql/2.setup.sql[MSSQL schema for offset storage]
 
 === Apache Kafka broker configuration
 

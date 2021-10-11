@@ -943,6 +943,7 @@ spring.datasource.url=jdbc:mysql://${DOCKER_HOST_IP}/eventuate
 spring.datasource.username=mysqluser
 spring.datasource.password=mysqlpw
 spring.datasource.driver.class.name=com.mysql.jdbc.driver
+eventuate.database.schema=eventuate
 ----
 
 ==== Micronaut
@@ -954,6 +955,10 @@ datasources:
     driverClassName: com.mysql.jdbc.driver
     username: mysqluser
     password: mysqlpw
+
+eventuate:
+    database:
+        schema: eventuate
 ----
 
 ==== Quarkus
@@ -964,7 +969,13 @@ quarkus.datasource.password=mysqlpw
 quarkus.datasource.jdbc.url=jdbc:mysql://localhost/eventuate
 quarkus.datasource.db-kind=mysql
 eventuateDatabase=mysql
+eventuate.database.schema=eventuate
 ----
+The `eventuate.database.schema` property is optional.
+You can use it to define database schema where Eventuate tables are located
+(Please read link:cdc-configuration.html[CDC Configuration document]).
+By default `eventuate` schema is used. Specify `NONE` to use schema from jdbc connection.
+
 
 In addition, you need to define message broker-specific properties.
 
