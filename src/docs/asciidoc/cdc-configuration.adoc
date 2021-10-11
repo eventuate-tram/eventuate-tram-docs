@@ -896,15 +896,139 @@ The CDC service requires various infrastructure services including:
 The Eventuate CDC service requires several tables.
 The Eventuate MySQL and Postgres images define these tables.
 
+==== Mysql schema example for eventuate local
+
+----
+create table events (
+  id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  event_id VARCHAR(255),
+  event_type LONGTEXT,
+  event_data LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  entity_type VARCHAR(255) NOT NULL,
+  entity_id VARCHAR(255) NOT NULL,
+  triggering_event LONGTEXT,
+  metadata LONGTEXT,
+  published TINYINT DEFAULT 0
+);
+
+create table entities (
+  entity_type VARCHAR(255),
+  entity_id VARCHAR(255),
+  entity_version LONGTEXT NOT NULL,
+  PRIMARY KEY(entity_type, entity_id)
+);
+
+create table snapshots (
+  entity_type VARCHAR(255),
+  entity_id VARCHAR(255),
+  entity_version VARCHAR(255),
+  snapshot_type LONGTEXT NOT NULL,
+  snapshot_json LONGTEXT NOT NULL,
+  triggering_events LONGTEXT,
+  PRIMARY KEY(entity_type, entity_id, entity_version)
+);
+----
+
+==== Mysql schema example for eventuate tram
+
+----
+CREATE TABLE message (
+  dbid BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  id LONGTEXT,
+  destination LONGTEXT NOT NULL,
+  headers LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  payload LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  published SMALLINT DEFAULT 0,
+  creation_time BIGINT
+);
+
+CREATE TABLE received_messages (
+  consumer_id VARCHAR(255),
+  message_id VARCHAR(255),
+  creation_time BIGINT,
+  published SMALLINT DEFAULT 0,
+  PRIMARY KEY(consumer_id, message_id)
+);
+----
+
+==== Mysql schema example for eventuate tram sagas
+
+----
+CREATE TABLE saga_instance_participants (
+  saga_type VARCHAR(255) NOT NULL,
+  saga_id VARCHAR(100) NOT NULL,
+  destination VARCHAR(100) NOT NULL,
+  resource VARCHAR(100) NOT NULL,
+  PRIMARY KEY(saga_type, saga_id, destination, resource)
+);
+
+CREATE TABLE saga_instance(
+  saga_type VARCHAR(255) NOT NULL,
+  saga_id VARCHAR(100) NOT NULL,
+  state_name VARCHAR(100) NOT NULL,
+  last_request_id VARCHAR(100),
+  end_state INT(1),
+  compensating INT(1),
+  saga_data_type VARCHAR(1000) NOT NULL,
+  saga_data_json VARCHAR(1000) NOT NULL,
+  PRIMARY KEY(saga_type, saga_id)
+);
+
+create table saga_lock_table(
+  target VARCHAR(100) PRIMARY KEY,
+  saga_type VARCHAR(255) NOT NULL,
+  saga_Id VARCHAR(100) NOT NULL
+);
+
+create table saga_stash_table(
+  message_id VARCHAR(100) PRIMARY KEY,
+  target VARCHAR(100) NOT NULL,
+  saga_type VARCHAR(255) NOT NULL,
+  saga_id VARCHAR(100) NOT NULL,
+  message_headers VARCHAR(1000) NOT NULL,
+  message_payload VARCHAR(1000) NOT NULL
+);
+----
+
 ==== `CDC_MONITORING` table
 
 The CDC service uses the `CDC_MONITORING` table to implement a 'heart beat' mechanism.
 Each reader that uses transaction log tailing (MySQL binlog/Postgres WAL) periodically updates a row in this table and measures the delay in receiving the update from the transaction log.
 
+----
+create table cdc_monitoring (
+  reader_id VARCHAR(255) PRIMARY KEY,
+  last_time BIGINT
+);
+----
 
 ==== `OFFSET_STORE` table
 
 When publishing messages to Apache ActiveMQ, RabbitMQ, Redis, the MySql binlog reader records the current binlog position in this table.
+
+----
+CREATE TABLE eventuate.offset_store(
+  client_name VARCHAR(255) NOT NULL PRIMARY KEY,
+  serialized_offset LONGTEXT
+);
+----
+
+==== Full Database Schema
+
+For full schema info, please see:
+
+https://github.com/eventuate-foundation/eventuate-common/tree/master/mysql
+
+https://github.com/eventuate-foundation/eventuate-common/tree/master/postgres
+
+https://github.com/eventuate-foundation/eventuate-common/tree/master/mssql
+
+
+https://github.com/eventuate-tram/eventuate-tram-sagas/tree/master/mysql
+
+https://github.com/eventuate-tram/eventuate-tram-sagas/tree/master/postgres
+
+https://github.com/eventuate-tram/eventuate-tram-sagas/tree/master/mssql
 
 === Apache Kafka broker configuration
 
