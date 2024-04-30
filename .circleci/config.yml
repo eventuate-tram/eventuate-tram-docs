@@ -1,7 +1,8 @@
 version: 2
 jobs:
   build:
-    machine: true
+    docker:
+      - image: circleci/openjdk:11-jdk
     working_directory: ~/eventuate-tram-docs
     steps:
       - checkout
@@ -15,4 +16,4 @@ jobs:
             - ~/.gradle
           key: eventuate-tram-docs-{{ checksum "build.gradle" }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
       - store_artifacts:
-          path: ~/eventuate-tram-docs/build/asciidoc/html5
+          path: ~/eventuate-tram-docs/build/docs/asciidoc

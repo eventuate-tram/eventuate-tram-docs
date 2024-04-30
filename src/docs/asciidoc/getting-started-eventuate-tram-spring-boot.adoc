@@ -1,0 +1,412 @@
+= Getting started with Eventuate Tram
+
+Read this document to learn how to get started with https://github.com/eventuate-tram/eventuate-tram-core[Eventuate Tram] for Spring Boot, which has a simpler getting started experience.
+
+NOTE: This document describes how to use the `2024.1.BUILD-SNAPSHOT` version.
+
+== What is Eventuate Tram?
+
+Eventuate Tram is a microservices collaboration platform.
+It directly or indirectly implements the following https://microservices.io/post/patterns/2023/07/29/service-collaboration-patterns.html[service collaboration patterns]: https://microservices.io/patterns/data/saga.html[Saga], https://microservices.io/patterns/data/command-side-replica.html[Command-side replica] and https://microservices.io/patterns/data/cqrs.html[CQRS].
+
+Eventuate sends and receives messages as part of a database transaction, which ensures that your service/application atomically updates the database and publishes/consumes messages.
+Messages are sent using the https://microservices.io/patterns/data/transactional-outbox.html[Transactional Outbox pattern], which guarantees that the service sends messages only if the database transaction commits successfully.
+Messages are consumed using the https://microservices.io/patterns/communication-style/idempotent-consumer.html[Idempotent Consumer pattern], which ensures that the service processes each message only once.
+
+To learn more, please see the article https://eventuate.io/post/eventuate/2020/02/24/why-eventuate.html[Eventuate explained using microservices patterns].
+
+== What technologies does it support?
+
+Currently, Eventuate Tram supports the following databases:
+
+* https://microservices.io/patterns/data/transaction-log-tailing.html[Transaction log tailing]: MySQL, Postgres
+* https://microservices.io/patterns/data/polling-publisher.html[Polling]: Other SQL databases including Microsoft SQL Server
+
+And, the following message brokers:
+
+* Apache Kafka
+* ActiveMQ
+* RabbitMQ
+* Redis
+
+== How to use Eventuate Tram
+
+To use Eventuate Tram in your application/service you must
+
+1. Add the  <<platform-bom, Eventuate Platform's BOM to your Maven/Gradle project>>
+2. Add the needed <<spring-boot-starters, Eventuate Spring Boot starters and use the Eventuate Tram APIs>>:
+  * <<events-starters, publishing and subscribing to events>>
+  * <<commands-starters, sending and receiving commands>>
+  * <<messages-starters, sending and receiving messages>>
+3. Add the <<transport-dependencies, transport-specific dependency>>
+4. Specify the <<configuration-properties, transport-specific configuration properties>>
+
+== Getting started examples
+
+The https://github.com/eventuate-tram/eventuate-tram-core-examples-basic/tree/development[Eventuate Tram basic examples] contains the complete code for the features described in this document.
+
+== See also
+
+* link:./about-eventuate-tram.html[Overview of EventuateTram]
+* https://eventuate.io/exampleapps.html[Example Eventuate applications]
+* The https://github.com/eventuate-tram/eventuate-tram-core[Eventuate Tram Github repository]
+* The https://github.com/eventuate-tram/eventuate-tram-sagas[Eventuate Tram Sagas Github repository]
+* The https://www.manning.com/books/microservices-patterns[Microservices Patterns] book
+
+== JavaDocs
+
+* See the https://eventuate.io/docs/javadoc/eventuate-tram/eventuate-tram.html[Eventuate Tram JavaDocs].
+
+[[platform-bom]]
+== Maven/Gradle project setup
+
+Latest framework version:
+
+////
+| Release
+| image::https://img.shields.io/maven-central/v/io.eventuate.platform/eventuate-platform-dependencies[link="https://search.maven.org/artifact/io.eventuate.platform/eventuate-platform-dependencies"]
+////
+
+[cols="a,a"]
+|===
+| Snapshot
+| image:https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Fsnapshots.repositories.eventuate.io%2Frepository%2Fio%2Feventuate%2Fplatform%2Feventuate-platform-dependencies%2Fmaven-metadata.xml[Maven metadata URL]
+[]
+|===
+
+
+=== Gradle Configuration
+
+In `gradle.properties`:
+
+----
+eventuatePlatformVersion=LATEST_VERSION
+----
+
+In `build.gradle`, specify these Maven repositories:
+
+
+[source, groovy]
+----
+repositories {
+    mavenCentral()
+}
+----
+
+Include the platform BOM:
+
+[source, groovy]
+----
+dependencies {
+  implementation(platform("io.eventuate.platform:eventuate-platform-dependencies:$eventuatePlatformVersion"))
+}
+----
+
+=== Maven Configuration
+
+TODO
+
+[[spring-boot-starters]]
+== Eventuate Tram APIs and (Spring Boot) starters
+
+Eventuate Tram provides the following APIs and Spring Boot starters:
+
+* Publishing and consuming events
+* Sending and receiving commands
+* Sending and receiving messages 
+
+[[events-starters]]
+== Event publishing and consuming events
+
+There are two APIs and starters:
+
+* Publishing events
+* Subscribing to events
+
+=== Publishing events
+
+To publish events, add this dependency to the `build.gradle`:
+
+[source, groovy]
+----
+dependencies { 
+  implementation "io.eventuate.tram.core:eventuate-tram-spring-events-publisher-starter"
+----
+
+The starter auto-configures a `DomainEventPublisher` bean, which can be used as follows:
+
+[source,java]
+----
+public class AccountService {
+
+  @Autowired
+  private DomainEventPublisher domainEventPublisher;
+
+  @Transactional
+  public void debitAccount(String accountId, Money amount) {
+    ...
+    
+    DomainEvent domainEvent = new AccountDebited(...);
+
+    domainEventPublisher.publish("Account", accountId, Collections.singletonList(domainEvent));
+----
+
+=== Subscribing to events
+
+To subscribe to events, add this dependency to the `build.gradle`:
+
+[source, groovy]
+----
+dependencies { 
+  implementation "io.eventuate.tram.core:eventuate-tram-spring-events-subscriber-starter"
+----
+
+
+The starter auto-configures a `DomainEventDispatcherFactory` bean, which can be used as follows:
+
+[source,java]
+----
+@Configuration
+public class EventSubscriberConfiguration {
+
+  @Bean
+  public DomainEventDispatcher domainEventDispatcher(DomainEventDispatcherFactory     
+                  domainEventDispatcherFactory, AccountEventsConsumer target) {
+    return domainEventDispatcherFactory.make("eventSubscriberId",
+                                             target.domainEventHandlers());
+  }
+
+  @Bean
+  public AccountEventsConsumer accountEventsConsumer() {
+    return new AccountEventsConsumer();
+  }
+----
+
+where the `AccountEventsConsumer` class is as follows:
+
+[source,java]
+----
+public class AccountEventsConsumer {
+
+  public DomainEventHandlers domainEventHandlers() {
+    return DomainEventHandlersBuilder
+            .forAggregateType("Account")
+            .onEvent(AccountDebited.class, this::handleAccountDebited)
+            .build();
+  }
+
+  public void handleAccountDebited(DomainEventEnvelope<AccountDebited> event) { ... }
+
+----
+
+[[commands-starters]]
+== Sending and receiving commands
+
+To send and receive commands, add the following dependencies to the `build.gradle`:
+
+[source, groovy]
+----
+dependencies { 
+  implementation "io.eventuate.tram.core:eventuate-tram-spring-commands-starter"
+----
+
+
+=== Sending commands and handling replies
+
+The `eventuate-tram-spring-commands-starter` dependency auto-configures a `CommandProducer` bean, which is used as follows:
+
+[source, java]
+----
+public class CommandProducingService {
+  @Autowired
+  private CommandProducer commandProducer;
+
+  void produceCommand(ProduceRequest produceRequest) {
+    String messageId = commandProducer.send(channel, command, replyChannel, );
+    ...
+----
+
+The `commandProducer.send()` method returns the message ID, which you can use to correlate the command with the reply message.
+
+=== Handling commands
+
+The `eventuate-tram-spring-commands-starter` dependency auto-configures a `CommandDispatcherFactory` bean, which you can use to configure command handlers:
+
+[source, java]
+----
+public class CommandConsumerConfiguration {
+  @Bean
+  public CommandDispatcher commandDispatcher(CommandDispatcherFactory commandDispatcherFactory, CreditManagementCommandHandlers creditManagementCommandHandlers) {
+    return commandDispatcherFactory.make(commandDispatcherId, creditManagementCommandHandlers.getCommandHandlers());
+  }
+ ...
+----
+
+where `CreditManagementCommandHandlers` is as follows:
+
+[source, java]
+----
+public class CreditManagementCommandHandlers {
+
+  public CommandHandlers getCommandHandlers() {
+    return CommandHandlersBuilder
+            .fromChannel(commandChannel)
+            .onMessage(ReserveCreditCommand.class, this::reserveCredit)
+            .build();
+  }
+
+  public Message reserveCredit(CommandMessage<ReserveCreditCommand> cm) {
+    ...
+    return withSuccess();
+  }
+....
+----
+
+It defines a `getCommandHandlers()` method that returns a `CommandHandlers` object that specifies the command handlers.
+
+[[messages-starters]]
+== Sending and receiving messages
+
+To send messages and receive messages add the following starter to the `build.gradle`:
+
+[source, groovy]
+----
+dependencies { 
+  implementation "io.eventuate.tram.core:eventuate-tram-spring-messaging-starter"
+----
+
+=== Sending messages
+
+This starter auto-configures a `MessageProducer` bean that you can use to send messages:
+
+[source, java]
+----
+public class MessageProducingService {
+
+    @Autowired
+    private MessageProducer messageProducer;
+
+    void sendMessage(long accountId) {
+        messageProducer.send(messageChannel, MessageBuilder.withPayload(String.valueOf(accountId)).build());
+    }
+----
+
+=== Receiving messages
+
+The `eventuate-tram-spring-messaging-starter` dependency auto-configures a `MessageConsumer` bean that you can use to subscribe to messages:
+
+[source, java]
+----
+@Component
+public class MessageHandler {
+
+  public MessageHandler(MessageConsumer messageConsumer ...) {
+    this.messageConsumer = messageConsumer;
+    ...
+
+  @PostConstruct
+  public void subscribe() {
+    messageConsumer.subscribe(messageConsumerId, Set.of(messageChannel), this::handleMessage);
+  }
+
+  public void handleMessage(Message message) {
+   ...
+----
+
+[[transport-dependencies]]
+== Adding the transport dependencies
+
+In addition to specifying the API dependencies, you must also specify the dependencies for the transport you are using.
+
+* Producer transport - JDBC
+* Consumer transport/message broker - `kafka`, `rabbitmq`, `activemq`, `redis`
+
+Adding the transport-specific dependencies to the classpath triggers the auto-configuration (by `eventuate-tram-spring-messaging-starter`) of the needed beans.
+
+=== Dependencies for a service that sends and receives messages
+
+[source, groovy]
+----
+dependencies {
+    runtimeOnly "io.eventuate.tram.core:eventuate-tram-spring-jdbc-$messageBroker"
+}
+----
+
+This dependency auto-configures the message broker-specific beans and JDBC-based idempotency.
+
+=== Dependencies for a service that receives messages without using JDBC-based idempotency
+
+[source, groovy]
+----
+dependencies {
+    runtimeOnly "io.eventuate.tram.core:eventuate-tram-spring-consumer-$messageBroker"
+}
+----
+
+This dependency only auto-configures the message broker-specific beans.
+
+=== Dependencies for a service that only sends messages
+
+[source, groovy]
+----
+dependencies {
+    runtimeOnly "io.eventuate.tram.core:eventuate-tram-spring-producer-jdbc"
+}
+----
+
+[[configuration-properties]]
+== Configuration properties 
+
+You must specific various configuration properties so that the Eventuate Tram framework can connect to the message broker and the database.
+
+=== Configuration properties for a producer service
+
+Since a producer inserts messages into an outbox table, you must configure the standard Spring Boot JDBC properties:
+
+[source, properties]
+----
+spring.datasource.url=jdbc:mysql://localhost/eventuate
+spring.datasource.username=mysqluser
+spring.datasource.password=mysqlpw
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+----
+
+In addition, you can optionally configure the `eventuate.database.schema` property, which specifies the qualifier that Eventuate Tram should use for the Eventuate tables in SQL statements.
+
+The default value for this property is `eventuate`.
+Other possible values are:
+
+* `none` - tables are referenced without a qualifier
+* the name to use as a table qualifier
+
+=== Configuration properties for a consumer service
+
+The configuration properties depend on the message broker you are using.
+
+==== Apache Kafka
+
+[source, properties]
+----
+eventuatelocal.kafka.bootstrap.servers=localhost:9092
+----
+
+==== ActiveMQ
+
+[source, properties]
+----
+activemq.url=tcp://localhost:61616
+----
+
+==== RabbitMQ
+
+[source, properties]
+----
+rabbitmq.broker.addresses=localhost
+eventuatelocal.zookeeper.connection.string=localhost:2181
+----
+
+Eventuate Tram uses Zookeeper to coordinate the RabbitMQ consumers in order to implement the Competing Consumers pattern (scaling consumers while preserving ordering).
+
+==== Configuration properties for consumers that implement idempotency using JDBC
+
+If a consumer uses JDBC-based idempotency, you must configure the standard Spring Boot JDBC properties and optionally, `eventuate.database.schema`, which, is described above, in order to specify the qualifier for the table that tracks the messages that have been processed.

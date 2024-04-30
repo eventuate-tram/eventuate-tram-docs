@@ -15,7 +15,7 @@ Eventuate Tram provides several messaging abstractions:
 
 === The architecture of an Eventuate Tram application
 
-The following diagram shows the architecture of the hhttps://github.com/eventuate-tram/eventuate-tram-examples-customers-and-orders[Eventuate Tram Customers and Orders application]:
+The following diagram shows the architecture of the https://github.com/eventuate-tram/eventuate-tram-examples-customers-and-orders[Eventuate Tram Customers and Orders application]:
 
 image::https://github.com/eventuate-tram/eventuate-tram-examples-customers-and-orders/raw/master/images/Eventuate_Tram_Customer_and_Order_Architecture.png[]
 

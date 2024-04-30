@@ -1,13 +1,17 @@
 = Eventuate Tram documentation
-Copyright (c) 2021 Chris Richardson Consulting Inc. All rights reserved
+Copyright (c) 2024 Chris Richardson Consulting Inc. All rights reserved
 
 The reference documentation consists of the following sections:
 
 [horizontal]
-<<whats-new.html#whats-new,What's new>> :: New features and other changes
-<<distributed-data-management.html#distributed-data-management, Distributed data management in a microservice architecture>> :: Why Eventuate Tram?
-<<about-eventuate-tram.html#about-eventuate-tram,Overview of Eventuate Tram>> :: Overview of Eventuate Tram
-<<getting-started-eventuate-tram.html#getting-started,Getting started with Eventuate Tram>> :: Getting started with Eventuate Tram
-<<getting-started-eventuate-tram-dotnet.html#getting-started,Getting started with Eventuate Tram .NET>> :: Getting started with Eventuate Tram .NET
-<<getting-started-eventuate-tram-sagas.html#getting-started-tram-sagas,Getting started with Eventuate Tram Sagas>> :: Getting started with Eventuate Tram Saga ochestration
-<<cdc-configuration.html#cdc-configuration,CDC configuration>> :: Configuring the CDC service
+<<whats-new#whats-new,What's new>> :: New features and other changes
+<<distributed-data-management#distributed-data-management, Distributed data management in a microservice architecture>> :: Why Eventuate Tram?
+<<about-eventuate-tram#about-eventuate-tram,Overview of Eventuate Tram>> :: Overview of Eventuate Tram
+
+<<getting-started-eventuate-tram#getting-started,Getting started with Eventuate Tram>> :: Getting started with Eventuate Tram
+
+<<getting-started-eventuate-tram-spring-boot#getting-started-eventuate-tram-spring-boot,WIP Simplified getting started with Eventuate Tram and Spring Boot-based>> :: WIP Simplified getting started with Eventuate Tram and Spring Boot-based
+
+<<getting-started-eventuate-tram-dotnet#getting-started,Getting started with Eventuate Tram .NET>> :: Getting started with Eventuate Tram .NET
+<<getting-started-eventuate-tram-sagas#getting-started-tram-sagas,Getting started with Eventuate Tram Sagas>> :: Getting started with Eventuate Tram Saga ochestration
+<<cdc-configuration#cdc-configuration,CDC configuration>> :: Configuring the CDC service
