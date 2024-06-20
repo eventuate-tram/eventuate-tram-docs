@@ -649,6 +649,10 @@ public class AbstractTramEventTestConfiguration {
 
 See this example of https://github.com/eventuate-tram-examples/eventuate-tram-core-quarkus-examples-basic/blob/main/eventuate-tram-examples-common/src/main/java/io/eventuate/tram/examples/basic/events/AbstractTramEventTestConfiguration.java[transaction events].
 
+Please note: if you want to have several dispatchers, you will need to use @Named annotation (https://docs.oracle.com/javaee/6/api/javax/inject/Named.html)
+on DomainEventDispatcher bean definitions. To initialize DomainEventDispatcher objects, eventuate framework iterates over all beans
+of that type and those beans should have unique names, otherwise only one of them will be retrieved from IoC container (micronaut specific behavior)
+without any explicit error.
 
 === Transactional commands
 
@@ -943,6 +947,7 @@ spring.datasource.url=jdbc:mysql://${DOCKER_HOST_IP}/eventuate
 spring.datasource.username=mysqluser
 spring.datasource.password=mysqlpw
 spring.datasource.driver.class.name=com.mysql.jdbc.driver
+eventuate.database.schema=eventuate
 ----
 
 ==== Micronaut
@@ -954,6 +959,10 @@ datasources:
     driverClassName: com.mysql.jdbc.driver
     username: mysqluser
     password: mysqlpw
+
+eventuate:
+    database:
+        schema: eventuate
 ----
 
 ==== Quarkus
@@ -964,7 +973,13 @@ quarkus.datasource.password=mysqlpw
 quarkus.datasource.jdbc.url=jdbc:mysql://localhost/eventuate
 quarkus.datasource.db-kind=mysql
 eventuateDatabase=mysql
+eventuate.database.schema=eventuate
 ----
+The `eventuate.database.schema` property is optional.
+You can use it to define database schema where Eventuate tables are located
+(Please read link:cdc-configuration.html[CDC Configuration document]).
+By default `eventuate` schema is used. Specify `NONE` to use schema from jdbc connection.
+
 
 In addition, you need to define message broker-specific properties.
 
