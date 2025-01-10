@@ -2,7 +2,9 @@
 
 Read this document to learn how to get started with https://github.com/eventuate-tram/eventuate-tram-core[Eventuate Tram] for Spring Boot, which has a simpler getting started experience.
 
-NOTE: This document describes how to use the `2024.1.BUILD-SNAPSHOT` version.
+NOTE: This document describes how to use the `2024.0.RELEASE` version of the platform and later with Spring Boot and Gradle.
+
+Please see the original getting started guide for variants: link:./getting-started-eventuate-tram.html[Getting started with Eventuate Tram]
 
 == What is Eventuate Tram?
 
@@ -29,7 +31,7 @@ And, the following message brokers:
 * RabbitMQ
 * Redis
 
-== How to use Eventuate Tram
+== How to use Eventuate Tram with Spring Boot
 
 To use Eventuate Tram in your application/service you must
 
@@ -62,13 +64,11 @@ The https://github.com/eventuate-tram/eventuate-tram-core-examples-basic/tree/de
 
 Latest framework version:
 
-////
-| Release
-| image::https://img.shields.io/maven-central/v/io.eventuate.platform/eventuate-platform-dependencies[link="https://search.maven.org/artifact/io.eventuate.platform/eventuate-platform-dependencies"]
-////
 
 [cols="a,a"]
 |===
+| Release
+| image::https://img.shields.io/maven-central/v/io.eventuate.platform/eventuate-platform-dependencies[link="https://search.maven.org/artifact/io.eventuate.platform/eventuate-platform-dependencies"]
 | Snapshot
 | image:https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Fsnapshots.repositories.eventuate.io%2Frepository%2Fio%2Feventuate%2Fplatform%2Feventuate-platform-dependencies%2Fmaven-metadata.xml[Maven metadata URL]
 []

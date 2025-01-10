@@ -15,9 +15,10 @@ And, the following message brokers:
 * RabbitMQ
 * Redis
 
-=== WIP Simplified getting started guide for Spring Boot-based applications
+=== Simplified getting started guide for Spring Boot/Gradle-based applications
 
-See link:./getting-started-eventuate-tram-spring-boot[Getting started with Eventuate Tram for Spring Boot-based applications].
+If you are using Spring Boot with Gradle, you can use the following simplified guide to get started with Eventuate Tram:
+link:./getting-started-eventuate-tram-spring-boot.html[Getting started with Eventuate Tram for Spring Boot-based applications].
 
 === See also
 

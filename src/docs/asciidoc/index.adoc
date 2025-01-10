@@ -10,7 +10,7 @@ The reference documentation consists of the following sections:
 
 <<getting-started-eventuate-tram#getting-started,Getting started with Eventuate Tram>> :: Getting started with Eventuate Tram
 
-<<getting-started-eventuate-tram-spring-boot#getting-started-eventuate-tram-spring-boot,WIP Simplified getting started with Eventuate Tram and Spring Boot-based>> :: WIP Simplified getting started with Eventuate Tram and Spring Boot-based
+<<getting-started-eventuate-tram-spring-boot#getting-started-eventuate-tram-spring-boot,Simplified getting started with Eventuate Tram and Spring Boot-based>> :: Simplified getting started with Eventuate Tram and for Spring Boot applications
 
 <<getting-started-eventuate-tram-dotnet#getting-started,Getting started with Eventuate Tram .NET>> :: Getting started with Eventuate Tram .NET
 <<getting-started-eventuate-tram-sagas#getting-started-tram-sagas,Getting started with Eventuate Tram Sagas>> :: Getting started with Eventuate Tram Saga ochestration
